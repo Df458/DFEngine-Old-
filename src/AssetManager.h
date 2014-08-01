@@ -10,17 +10,20 @@ public:
 	AssetManager();
 	~AssetManager();
 	
-	Font* getFont(std::string id) 	  { return &fonts[id];   }
+	Font*  getFont(std::string id) 	  { return &fonts[id];   }
 	ALuint getSound(std::string id)   { return sounds[id];   }
 	GLuint getTexture(std::string id) { return textures[id]; }
 	GLuint getShader(std::string id)  { return shaders[id];  }
 	GLuint getProgram(std::string id) { return programs[id]; }
+	GLuint getDefaultUV()			  { return default_uv; }
+	std::pair<GLuint, GLuint> getModel(std::string id) { return models[id];   }
 
 	void loadFont(std::string path, Vec2d size);
 	void loadSound(std::string path);
 	void loadTexture(std::string path);
-	void loadShader(std::string path);
+	void loadShader(std::string path, bool frag = true);
 	void compileProgram(std::string id, std::vector<std::string> shader_ids);
+	void loadModel(std::string path);
 	
 	void cleanup();
 protected:
@@ -29,8 +32,10 @@ protected:
 	std::map<std::string, GLuint> textures;
 	std::map<std::string, GLuint> shaders;
 	std::map<std::string, GLuint> programs;
+	std::map<std::string, std::pair<GLuint, GLuint>> models;
 	
 	FT_Library freetype_library;
+	GLuint default_uv;
 };
 }
 #endif

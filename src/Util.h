@@ -25,6 +25,10 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 extern "C" {
 #include <lua5.1/lua.h>
 #include <lua5.1/lualib.h>
@@ -51,6 +55,5 @@ void insertVec3d(lua_State* ls, std::string key, Vec3d v);
 void retrieveVec2d(lua_State* ls, std::string key, Vec2d& v);
 void retrieveVec3d(lua_State* ls, std::string key, Vec3d& v);
 float clamp(float val, float low, float high);
-void drawGlRect(float w, float h);
 
 #endif

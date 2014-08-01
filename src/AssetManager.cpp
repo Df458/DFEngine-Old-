@@ -4,6 +4,45 @@ using namespace df;
 
 AssetManager::AssetManager() {
 	FT_Init_FreeType(&freetype_library);
+	
+	static const GLfloat rect_vertex_data[] = { 
+		-1.0f, -1.0f, 0.0f,
+		 1.0f, -1.0f, 0.0f,
+		-1.0f,  1.0f, 0.0f,
+		 1.0f,  1.0f, 0.0f,
+	};
+	static const GLfloat rect_uv_data[] = { 
+		 0.0f,  1.0f,
+		 1.0f,  1.0f,
+		 0.0f,  0.0f,
+		 1.0f,  0.0f,
+	};
+	static const GLuint rect_index_data[] = { 
+		0, 1, 2, 3
+	};
+	
+	GLuint rect_model;
+	GLuint indices;
+	glGenBuffers(1, &rect_model);
+	glBindBuffer(GL_ARRAY_BUFFER, rect_model);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(rect_vertex_data), rect_vertex_data, GL_STATIC_DRAW);
+	
+	glGenBuffers(1, &indices);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rect_index_data), rect_index_data, GL_STATIC_DRAW);
+	
+	models["default"] = std::pair<GLuint, GLuint> (rect_model, indices);
+	
+	glGenBuffers(1, &default_uv);
+	glBindBuffer(GL_ARRAY_BUFFER, default_uv);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(rect_uv_data), rect_uv_data, GL_STATIC_DRAW);
+	
+	loadShader("default.vert", false);
+	loadShader("default.frag");
+	std::vector<std::string>vec;
+	vec.push_back("default.vert");
+	vec.push_back("default.frag");
+	compileProgram("default", vec);
 }
 
 AssetManager::~AssetManager() {
@@ -219,33 +258,39 @@ void AssetManager::loadSound(std::string path) {
 	sounds[fname] = sound_source;
 }
 
-void AssetManager::loadShader(std::string path) {
+void AssetManager::loadShader(std::string path, bool frag) {
 	std::string fname = path;
 	path = getPath().append("/data/shaders/" + path);
 	FILE* infile = fopen(path.c_str(), "r");
-	std::vector<const char*> command_vector;
-	char c;
-	std::string command;
-	do {
-		c = fgetc(infile);
-		if(c == '\n' || c == '\0') {
-			command += '\0';
-			char* cpy = new char[command.length()];
-			std::copy(command.c_str(), command.c_str() + command.length(), cpy);
-			command_vector.push_back(cpy);
-			command.clear();
-		} else
-			command += c;
-	} while(c != EOF);
-	
-	const char** shaderdat = new const char*[command_vector.size()];
-	for(unsigned i = 0; i < command_vector.size(); ++i)
-		shaderdat[i] = command_vector[i];
-	
-	GLuint shader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(shader, command_vector.size(), shaderdat, NULL);
+	fseek(infile, 0, SEEK_END);
+	int length = ftell(infile);
+	fseek(infile, 0, SEEK_SET);
+	char* input_data = new char[length];
+	fread((void*) input_data, 1, (size_t)length, infile);
+	input_data[length-1] = '\0';
+	fclose(infile);
+	const char* shader_data[2] = {input_data, "\0"};
+
+	GLuint shader;
+	if(frag)
+		shader = glCreateShader(GL_FRAGMENT_SHADER);
+	else
+		shader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(shader, 1, shader_data, NULL);
 	glCompileShader(shader);
 	shaders[fname] = shader;
+	
+	/*GLint Result = GL_FALSE;
+	int InfoLogLength;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &Result);
+	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &InfoLogLength);
+	if ( InfoLogLength > 0 ){
+		std::cerr << "Errors in " << fname << ": \n";
+		std::cerr << "Data: \n" << shader_data[0] << "\n";
+		std::vector<char> VertexShaderErrorMessage(InfoLogLength+1);
+		glGetShaderInfoLog(shader, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
+		printf("%s\n", &VertexShaderErrorMessage[0]);
+	}*/
 }
 
 void AssetManager::compileProgram(std::string program_id, std::vector<std::string> shader_ids) {

@@ -11,7 +11,7 @@ OBJPATH=obj/
 ENGINESRCS:=$(wildcard *.cpp)
 ENGINEOBJS:=$(patsubst $(SRCPATH)%.cpp,$(OBJPATH)%.o,$(wildcard $(SRCPATH)*.cpp))
 ENGINEDEPS:=$(patsubst $(SRCPATH)%.cpp,$(OBJPATH)%.depend,$(wildcard $(SRCPATH)*.cpp))
-ENGINEAPP=build/DFEngine
+ENGINEAPP=DFEngine
 ifeq ($(OS), GNU/Linux)
 OSFLAGS=$(LINUXFLAGS)
 OSLIBS=$(LINUXLIBS)
@@ -46,7 +46,7 @@ release:
 	@cp $(ENGINEAPP) bin
 
 -include $(patsubst $(SRCPATH)%.cpp,$(OBJPATH)%.depend,$(wildcard $(SRCPATH)*.cpp))
-$(shell   mkdir -p build obj)
+$(shell   mkdir -p obj)
 
 .PHONY: clean
 clean:

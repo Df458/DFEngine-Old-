@@ -29,7 +29,6 @@ PhysicsSystem::PhysicsSystem() {
 }
 
 PhysicsSystem::~PhysicsSystem() {
-	delete _broad_phase;
 	delete _collision_config;
 	delete _collision_dispatch;
 	delete _solver;

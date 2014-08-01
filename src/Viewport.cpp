@@ -14,7 +14,7 @@ void Viewport::run(float delta_time) {
 	self_position = requestPosition();
 	self_size = requestSize();
 
-	glClear(GL_DEPTH_BUFFER_BIT); //Setup the viewport for drawing
+	glClear(GL_DEPTH_BUFFER_BIT);
 	glViewport (self_position.x, self_position.y-self_size.y, self_size.x, self_size.y);
 	glLoadIdentity();
 	glEnable(GL_BLEND);
@@ -28,59 +28,53 @@ void Viewport::run(float delta_time) {
 		fill.x *= ratio;
 	if(ratio <= 1)
 		fill.y /= ratio;
-	glOrtho(0, fill.x, fill.y, 0, -1, 1);
 	
 	Vec2d fillsize = Vec2d(game->getViewSize().x, game->getViewSize().y);
 	
-	 
-	glPushMatrix(); //Apply view transforms
 	translation = game->getCameraTranslate();
 	rotation = game->getCameraRotate();
 	scale = game->getCameraScale();
-	glTranslatef(translation.x + (fill.x - fillsize.x) / 2, translation.y + (fill.y - fillsize.y) / 2, translation.z);
-	glRotatef(rotation.x, 1, 0, 0);
-	glRotatef(rotation.y, 0, 1, 0);
-	glRotatef(rotation.z, 0, 0, 1);
-	glScalef(scale.x, scale.y, scale.z);
 	
-	game->draw(delta_time);
+	glm::mat4 projection = glm::ortho(0.0f, fill.x, fill.y, 0.0f, -1.0f, 1.0f);
+	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(translation.x + (fill.x - fillsize.x) / 2, translation.y + (fill.y - fillsize.y) / 2, translation.z)) * 
+	glm::rotate(glm::mat4(1.0f), rotation.x, glm::vec3(1.0f, 0.0f, 0.0f)) * 
+	glm::rotate(glm::mat4(1.0f), rotation.y, glm::vec3(0.0f, 1.0f, 0.0f)) * 
+	glm::rotate(glm::mat4(1.0f), rotation.z, glm::vec3(0.0f, 0.0f, 1.0f)) * 
+	glm::scale(glm::mat4(1.0f), glm::vec3(scale.x, scale.y, scale.z));
+	
+	game->draw(delta_time, view, projection);
 
-	glPopMatrix();
-	glUseProgram(0);
-	glColor4f(0,0,0,1);
-	glDisable(GL_TEXTURE_2D);
-	glBegin(GL_QUADS);
-		glVertex2f(0, 0);
-		glVertex2f((fill.x - fillsize.x) / 2, 0);
-		glVertex2f((fill.x - fillsize.x) / 2, fill.y);
-		glVertex2f(0, fill.y);
-		
-		glVertex2f(fill.x - ((fill.x - fillsize.x) / 2), 0);
-		glVertex2f(fill.x, 0);
-		glVertex2f(fill.x, fill.y);
-		glVertex2f(fill.x - ((fill.x - fillsize.x) / 2), fill.y);
-		
-		glVertex2f(0, 0);
-		glVertex2f(fill.x, 0);
-		glVertex2f(fill.x, (fill.y - fillsize.y) / 2);
-		glVertex2f(0, (fill.y - fillsize.y) / 2);
-		
-		glVertex2f(0, fill.y - (fill.y - fillsize.y) / 2);
-		glVertex2f(fill.x, fill.y - (fill.y - fillsize.y) / 2);
-		glVertex2f(fill.x, fill.y);
-		glVertex2f(0, fill.y);
-	glEnd();
 	
-	/*if(_is_active) {
-		glLineWidth(3);
-		glColor4f(0.7f, 0.7f, 0.7f, 1);
-		glBegin(GL_LINE_LOOP);
-			glVertex2f(0, 0);
-			glVertex2f(size.x / (_preferred_size.x), 0);
-			glVertex2f(size.x / (_preferred_size.x), size.y / (_preferred_size.y));
-			glVertex2f(0, size.y / (_preferred_size.y));
-		glEnd();
-	}*/
+
+	
+	GLuint program = game->getAssetManager()->getProgram("default");
+	GLuint vertex_buffer = game->getAssetManager()->getModel("default").first;
+	GLuint vertex_indices = game->getAssetManager()->getModel("default").second;
+	glm::vec4 blend_color = {0.0f, 0.0f, 0.0f, 1.0f};
+
+	GLuint vertex_attr_pos = glGetAttribLocation(program, "vertex_pos");
+	GLuint mvp_uniform_pos = glGetUniformLocation(program, "model_view_projection");
+
+	glUseProgram(program);
+	
+	glm::mat4 border_transforms[4] = {
+		projection * glm::scale(glm::mat4(1.0f), glm::vec3((fill.x - fillsize.x) / 2, fill.y, 1)),
+		projection * glm::translate(glm::mat4(1.0f), glm::vec3(fill.x, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3((fill.x - fillsize.x) / 2, fill.y, 1)),
+		projection * glm::scale(glm::mat4(1.0f), glm::vec3(fill.x, (fill.y - fillsize.y) / 2, 1)),
+		projection * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, fill.y, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(fill.x, (fill.y - fillsize.y) / 2, 1)),
+	};
+	
+	glUniform4fv(glGetUniformLocation(program, "color"), 1, (GLfloat*)&blend_color);
+	for(int i = 0; i < 4; ++i) {
+		glUniformMatrix4fv(mvp_uniform_pos, 1, GL_FALSE, &border_transforms[i][0][0]);
+
+		glEnableVertexAttribArray(vertex_attr_pos);
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_indices);
+		glVertexAttribPointer(vertex_attr_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
+	}
+	
 }
 
 void Viewport::keyEvent(int key, int scancode, int action, int modifiers) {

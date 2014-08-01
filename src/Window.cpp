@@ -8,7 +8,7 @@ Window::Window() {
 	init = window;
 	
 	if(init) {
-		title = "Day of the Hotdog";
+		title = "DFEngine Window";
 		glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 		glfwSetKeyCallback(window, KeyInputCallback);
 		glfwSetMouseButtonCallback(window, MouseInputCallback);
@@ -31,17 +31,16 @@ void Window::run(float delta_time) {
 		return;
 	}
 	
-	glfwSwapBuffers(window);
-	
 	double mx, my;
 	glfwGetCursorPos(window, &mx, &my);
 	mouseMoveEvent(Vec2d(mx, my));
 	
-	glClearColor(game->getBg().x,game->getBg().y,game->getBg().z,1.0);
+	glClearColor(game->getBg().x, game->getBg().y, game->getBg().z, 1.0);
 	
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	SingleContainer::run(delta_time);
+	glfwSwapBuffers(window);
 }
 
 void df::KeyInputCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers) {

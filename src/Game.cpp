@@ -162,12 +162,14 @@ void Game::killAll() {
 	}
 }
 
-void Game::draw(float delta_time) {
+void Game::draw(float delta_time, glm::mat4 nview, glm::mat4 nprojection) {
+	view = nview;
+	projection = nprojection;
+
 	sys_graphics.run(delta_time);
 	for(auto e : _entities) {
-		glUseProgram(0);
 		Entity* entity = e.second;
-		if(!entity->getDrawScr().empty() && entity->getAlive() && !entity->getDestroyed()) {	 
+		if(!entity->getDrawScr().empty() && entity->getAlive() && !entity->getDestroyed()) {
 			lua_State* s1 = game_state;
 		
 			lua_newtable(s1);
@@ -223,7 +225,7 @@ void Game::addComponent(unsigned entity_id, Component* cmp, std::string cmp_id) 
 		int cmp_type;
 		for(cmp_type = 0; cmp_type < COMPONENT_TYPE_COUNT && component_type_str[cmp_type] != cmp_id; ++cmp_type);
 		switch(cmp_type) {
-			case COMPONENT_RECTGRAPHICS:
+			case COMPONENT_GRAPHICS:
 				sys_graphics.addComponent(entity_id, cmp);
 			break;
 			case COMPONENT_PHYSICS:

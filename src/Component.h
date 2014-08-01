@@ -6,11 +6,16 @@ namespace df {
 
 class Entity;
 
-enum component_type {COMPONENT_BASIC = 0, COMPONENT_PHYSICS,
-					COMPONENT_RECTGRAPHICS, COMPONENT_RECTPHYSICS, 
-					COMPONENT_CIRCLEPHYSICS, COMPONENT_MESHPHYSICS, 
-					COMPONENT_STORAGE, COMPONENT_TIMER, COMPONENT_TYPE_COUNT};
-const std::string component_type_str[COMPONENT_TYPE_COUNT] = { "basic", "physics", "rectangle graphics", "rectangle physics", "circle physics", "mesh physics", "storage", "timer" };
+enum component_type {COMPONENT_BASIC = 0, 
+					 COMPONENT_GRAPHICS,
+					 COMPONENT_PHYSICS,
+					 COMPONENT_RECTPHYSICS, 
+					 COMPONENT_CIRCLEPHYSICS, 
+					 COMPONENT_MESHPHYSICS, 
+					 COMPONENT_STORAGE, 
+					 COMPONENT_TIMER, 
+					 COMPONENT_TYPE_COUNT};
+const std::string component_type_str[COMPONENT_TYPE_COUNT] = { "basic", "graphics", "physics", "rectangle physics", "circle physics", "mesh physics", "storage", "timer" };
 
 enum collision_type { COLLISION_NONE, COLLISION_RECT, COLLISION_CIRCLE, COLLISION_MESH };
 
@@ -31,8 +36,8 @@ public:
 
 class GraphicsComponent : public Component {
 public:
-	GraphicsComponent() { color = Vec3d(1, 1, 1); }
-	virtual void _runSub(float delta_time) = 0;
+	GraphicsComponent();
+	virtual void _runSub(float delta_time);
 	virtual void* _retrieveSub(std::string key) { 
 		if(key == "color.r") return &color.x;
 		if(key == "color.g") return &color.y;
@@ -53,6 +58,14 @@ public:
 	
 		lua_setfield(ls, -2, "color");
 		
+		insertVec3d(ls, "scale", scale);
+		
+		lua_pushinteger(ls, texture);
+		lua_setfield(ls, -2, "texture");
+		
+		lua_pushinteger(ls, uv);
+		lua_setfield(ls, -2, "uv");
+		
 		lua_pushinteger(ls, program);
 		lua_setfield(ls, -2, "shader_program");
 	}
@@ -67,45 +80,24 @@ public:
 		lua_getfield(ls, -4, "a");
 		alpha = lua_tonumber(ls, -1);
 		lua_pop(ls, 5);
-		lua_getfield(ls, -1, "shader_program");
+		
+		retrieveVec3d(ls, "scale", scale);
+		
+		lua_getfield(ls, -1, "texture");
+		texture = lua_tointeger(ls, -1);
+		lua_getfield(ls, -2, "uv");
+		uv = lua_tointeger(ls, -1);
+		lua_getfield(ls, -3, "shader_program");
 		program = lua_tointeger(ls, -1);
-		lua_pop(ls, 1);
+		lua_pop(ls, 3);
 	}
 	Vec3d color;
 	float alpha = 1;
-	GLuint program = 0;
-};
-
-class RectGraphicsComponent : public GraphicsComponent {
-public:
-	virtual void _runSub(float delta_time);
-	virtual void* _retrieveSub(std::string key) {
-		if(key == "width") return &dimensions.x;
-		if(key == "height") return &dimensions.y;
-		return GraphicsComponent::_retrieveSub(key);
-	}
-	virtual void _insertDataSub(lua_State* ls) {
-		lua_pushnumber(ls, dimensions.x);
-		lua_setfield(ls, -2, "width");
-		lua_pushnumber(ls, dimensions.y);
-		lua_setfield(ls, -2, "height");
-		lua_pushinteger(ls, texture_id);
-		lua_setfield(ls, -2, "texture");
-		GraphicsComponent::_insertDataSub(ls);
-	}
-	virtual void _retrieveDataSub(lua_State* ls) {
-		lua_getfield(ls, -1, "width");
-		dimensions.x = lua_tonumber(ls, -1);
-		lua_getfield(ls, -2, "height");
-		dimensions.y = lua_tonumber(ls, -1);
-		lua_getfield(ls, -3, "texture");
-		texture_id = lua_tointeger(ls, -1);
-		lua_pop(ls, 3);
-		GraphicsComponent::_retrieveDataSub(ls);
-	}
-	Vec2d dimensions = Vec2d(50, 50);
-	GLuint texture_id;
-	bool has_texture = false;
+	GLuint program;
+	std::pair<GLuint, GLuint> model;
+	GLuint texture;
+	GLuint uv;
+	Vec3d scale = Vec3d(1, 1, 1);
 };
 
 class PhysicsComponent : public Component {

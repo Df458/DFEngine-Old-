@@ -13,9 +13,9 @@ int main(int argc, char** argv) {
 		return -1;
 	
 	glfwWindowHint(GLFW_SAMPLES, 16);
-	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); Uncomment the following 3 lines to try the newer stuff later
-	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 	
 	Window window;
 	if(!window.exists()) {
@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
 		glfwTerminate();
 		return -1;
 	}
-	window.setTitle("Day of the Hotdog");
+	window.setTitle("DFEngine Window");
 	
 	Viewport* view1 = new Viewport();
 	view1->setFill(true);
@@ -33,9 +33,10 @@ int main(int argc, char** argv) {
 	window.prepareForDrawing();
 	window.addChild(box1);
 	box1->addChild(view1);
-		
+	
 	glewExperimental = true;
-	glewInit();
+	if(glewInit() != GLEW_OK)
+		std::cerr << "Glew init failed!";
 	
 	game = new Game();
 	game->init();
@@ -49,7 +50,7 @@ int main(int argc, char** argv) {
 		glfwPollEvents();
 	}
 	game->cleanup();
-	//delete game;
+	delete game;
 	delete box1;
 	delete view1;
 	

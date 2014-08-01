@@ -3,45 +3,58 @@
 
 using namespace df;
 
-void RectGraphicsComponent::_runSub(float delta_time) {
-	glUseProgram(program);
+GraphicsComponent::GraphicsComponent() {
+	color = Vec3d(1, 1, 1);
+	program = game->getAssetManager()->getProgram("default");
+	uv = game->getAssetManager()->getDefaultUV();
+	model = game->getAssetManager()->getModel("default");
+}
+
+void GraphicsComponent::_runSub(float delta_time) {
 	Component* cmp = game->getComponent(_owner_id, component_type_str[COMPONENT_PHYSICS]);
 	if(!cmp)
 		return;
+
 	PhysicsComponent* transforms = dynamic_cast<PhysicsComponent*>(cmp);
 	btMotionState* state = transforms->body->getMotionState();
 	btTransform trans;
 	float gltransform[16];
 	state->getWorldTransform(trans);
-	trans.getOpenGLMatrix(gltransform);
-	for(int i = 12; i < 15; ++i)
-		gltransform[i] *= 10;
 	
-	if(!has_texture)
-		glDisable(GL_TEXTURE_2D);
-	else {
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, texture_id);
-	}
+	glm::mat4 model_transform = 
+	glm::translate(glm::mat4(1.0f), glm::vec3(trans.getOrigin().getX() * 10, trans.getOrigin().getY() * 10, trans.getOrigin().getZ() * 10)) *
+	glm::rotate(glm::mat4(1.0f), trans.getRotation().getAngle(), glm::vec3(trans.getRotation().getAxis().getX(), trans.getRotation().getAxis().getY(), trans.getRotation().getAxis().getZ())) *
+	glm::scale(glm::mat4(1.0f), glm::vec3(scale.x, scale.y, scale.z));
+	glm::mat4 view_transform = game->getCameraView();
+	glm::mat4 projection_transform = game->getCameraProjection();
+	glm::mat4 mvp_matrix = projection_transform * view_transform * model_transform;
+	glm::vec4 blend_color = {color.x, color.y, color.z, alpha};
+	
+	glUseProgram(program);
+	GLuint vertex_attr_pos = glGetAttribLocation(program, "vertex_pos");
+	GLuint uv_attr_pos = glGetAttribLocation(program, "uv_out");
+	GLuint mvp_uniform_pos = glGetUniformLocation(program, "model_view_projection");
+	GLuint texture_uniform_pos  = glGetUniformLocation(program, "tex");
+	GLuint color_uniform_pos = glGetUniformLocation(program, "color");
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glUniform1i(texture_uniform_pos, 0);
+	glUniformMatrix4fv(mvp_uniform_pos, 1, GL_FALSE, &mvp_matrix[0][0]);
+	glUniform4fv(color_uniform_pos, 1, (GLfloat*)&blend_color);
+	
+	glEnableVertexAttribArray(vertex_attr_pos);
+	glBindBuffer(GL_ARRAY_BUFFER, model.first);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model.second);
+	glVertexAttribPointer(vertex_attr_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(uv_attr_pos);
+	glBindBuffer(GL_ARRAY_BUFFER, uv);
+	glVertexAttribPointer(uv_attr_pos, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-	glPushMatrix();
-	//glTranslatef(trans.getOrigin().getX() * 10.0f, trans.getOrigin().getY() * 10.0f, trans.getOrigin().getZ() * 10.0f);
-	//glRotatef(trans.getRotation().x(), trans.getRotation().y(), trans.getRotation().z(), trans.getRotation().w());
-	//glRotatef(_transforms->rotation.x, 1, 0, 0);
-	//glRotatef(_transforms->rotation.y, 0, 1, 0);
-	//glRotatef(_transforms->rotation.z, 0, 0, 1);
-	//glScalef(_transforms->scale.x, _transforms->scale.y, _transforms->scale.z);
-	glMultMatrixf(gltransform);
-	
-	glColor4f(color.x, color.y, color.z, alpha);
-	drawGlRect(dimensions.x, dimensions.y);
-	/*glBegin(GL_QUADS);
-		glTexCoord2f(0, 1); glVertex3f(-dimensions.x / 2,-dimensions.y / 2,0);
-		glTexCoord2f(1, 1); glVertex3f(dimensions.x / 2,-dimensions.y / 2,0);
-		glTexCoord2f(1, 0); glVertex3f(dimensions.x / 2,dimensions.y / 2,0);
-		glTexCoord2f(0, 0); glVertex3f(-dimensions.x / 2,dimensions.y / 2,0);
-	glEnd();*/
-	glPopMatrix();
+	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
+
+	glDisableVertexAttribArray(vertex_attr_pos);
+	glDisableVertexAttribArray(uv_attr_pos);
 }
 
 void TimerComponent::_runSub(float delta_time) {

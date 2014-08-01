@@ -17,7 +17,7 @@ public:
 	void init();
 	void cleanup();
 	void run(float delta_time);
-	void draw(float delta_time);
+	void draw(float delta_time, glm::mat4 view, glm::mat4 projection);
 	void addTween(Tween<float> t) { _tweens.push_back(t); }
 	void addTweenSelf(std::string target_field, float target_value, float target_time, int itype, int etype);
 	void keyEvent(int key, int scancode, int action, int modifiers);
@@ -43,6 +43,8 @@ public:
 	Vec3d getCameraRotate() {return cam_rotate;}
 	Vec3d getCameraScale() {return cam_scale;}
 	lua_State* getState() { return game_state; }
+	glm::mat4 getCameraView() { return view; }
+	glm::mat4 getCameraProjection() { return projection; }
 	friend Entity::Entity(unsigned);
 	friend void Entity::destroy();
 protected:
@@ -73,6 +75,7 @@ protected:
 	std::stack<unsigned> _free_ids;
 	
 	lua_State* game_state;
+	glm::mat4 view, projection;
 };
 
 extern Game* game;
@@ -143,23 +146,6 @@ static int lua_drawText(lua_State* ls) {
 	}
 	
 	game->getAssetManager()->getFont(font_name)->draw(text, position, rotation, scale, color, alpha);
-	return 0;
-}
-
-static int lua_drawRect(lua_State* ls) {
-	glPushMatrix();
-	int arg_count = lua_gettop(ls);
-	if(arg_count < 10)
-		glDisable(GL_TEXTURE_2D);
-	else {
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, lua_tointeger(ls, 10));
-	}
-	glTranslatef(lua_tonumber(ls, 1), lua_tonumber(ls, 2), lua_tonumber(ls, 3));
-	if(arg_count >= 9)
-		glColor4f(lua_tonumber(ls, 6), lua_tonumber(ls, 7), lua_tonumber(ls, 8), lua_tonumber(ls, 9));
-	drawGlRect(lua_tonumber(ls, 4), lua_tonumber(ls, 5));
-	glPopMatrix();
 	return 0;
 }
 
@@ -238,16 +224,8 @@ static int lua_addComponent(lua_State* ls) {
 			game->addComponent(id, cmp_dat, component_type_str[COMPONENT_PHYSICS]);
 		} break;
 		
-		case COMPONENT_RECTGRAPHICS: {
-			RectGraphicsComponent* cmp_dat = new RectGraphicsComponent;
-			cmp_dat->has_texture = lua_toboolean(ls, 3);
-			cmp_dat->texture_id = lua_tointeger(ls, 4);
-			if(arg_count >= 6)
-				cmp_dat->dimensions = Vec2d(lua_tonumber(ls, 5), lua_tonumber(ls, 6));
-			if(arg_count >= 10) {
-				cmp_dat->color = Vec3d(lua_tonumber(ls, 7), lua_tonumber(ls, 8), lua_tonumber(ls, 9));
-				cmp_dat->alpha = lua_tonumber(ls, 10);
-			}
+		case COMPONENT_GRAPHICS: {
+			GraphicsComponent* cmp_dat = new GraphicsComponent;
 			game->addComponent(id, cmp_dat, component_type_str[component_type]);
 		} break;
 		
@@ -442,7 +420,6 @@ static const luaL_reg lua_game_functions[] = {
 	{"addComponent", lua_addComponent},
 	{"addTween", lua_addTween},
 	{"drawText", lua_drawText},
-	{"drawRect", lua_drawRect},
 	{"getMouseData", lua_getMouseData},
 	{"setScript", lua_setScript},
 	{"getObjectData", lua_getObjectData},

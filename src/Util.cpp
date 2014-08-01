@@ -79,12 +79,3 @@ float clamp(float val, float low, float high) {
 		val = high;
 	return val;
 }
-
-void drawGlRect(float w, float h) {
-	glBegin(GL_QUADS);
-		glTexCoord2f(0, 1); glVertex3f(-w / 2, -h / 2,0);
-		glTexCoord2f(1, 1); glVertex3f(w / 2, -h / 2,0);
-		glTexCoord2f(1, 0); glVertex3f(w / 2, h / 2,0);
-		glTexCoord2f(0, 0); glVertex3f(-w / 2, h / 2,0);
-	glEnd();
-}
