@@ -82,8 +82,9 @@ void Font::draw(std::string text, Vec3d position, Vec3d rotation, Vec3d scale, V
 	GLuint color_uniform_pos = glGetUniformLocation(program, "color");
 	
 	glEnableVertexAttribArray(vertex_attr_pos);
-	glBindBuffer(GL_ARRAY_BUFFER, game->getAssetManager()->getModel("default").first);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, game->getAssetManager()->getModel("default").second);
+	Model m = game->getAssetManager()->getModel("default");
+	glBindBuffer(GL_ARRAY_BUFFER, m.vertex_buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m.index_buffer);
 	glVertexAttribPointer(vertex_attr_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(uv_attr_pos);
 	glBindBuffer(GL_ARRAY_BUFFER, game->getAssetManager()->getDefaultUV());
@@ -110,7 +111,7 @@ void Font::draw(std::string text, Vec3d position, Vec3d rotation, Vec3d scale, V
 		glUniformMatrix4fv(mvp_uniform_pos, 1, GL_FALSE, &mvp_matrix[0][0]);
 		glUniform4fv(color_uniform_pos, 1, (GLfloat*)&blend_color);
 		
-		glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, m.index_count, GL_UNSIGNED_INT, 0);
 		
 		pos.x += glyphs[text[i]].advance;
 	}

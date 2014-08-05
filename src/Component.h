@@ -2,6 +2,7 @@
 #define DF_COMPONENT
 #include "Util.h"
 #include "Tween.h"
+#include "Model.h"
 namespace df {
 
 class Entity;
@@ -94,7 +95,7 @@ public:
 	Vec3d color;
 	float alpha = 1;
 	GLuint program;
-	std::pair<GLuint, GLuint> model;
+	Model model;
 	GLuint texture;
 	GLuint uv;
 	Vec3d scale = Vec3d(1, 1, 1);

@@ -46,14 +46,16 @@ void Viewport::run(float delta_time) {
 
 	
 
-	
+	Model m = game->getAssetManager()->getModel("default");
 	GLuint program = game->getAssetManager()->getProgram("default");
-	GLuint vertex_buffer = game->getAssetManager()->getModel("default").first;
-	GLuint vertex_indices = game->getAssetManager()->getModel("default").second;
+	GLuint vertex_buffer = m.vertex_buffer;
+	GLuint vertex_indices = m.index_buffer;
 	glm::vec4 blend_color = {0.0f, 0.0f, 0.0f, 1.0f};
+	GLuint texture = game->getAssetManager()->getTexture("default");
 
 	GLuint vertex_attr_pos = glGetAttribLocation(program, "vertex_pos");
 	GLuint mvp_uniform_pos = glGetUniformLocation(program, "model_view_projection");
+	GLuint texture_uniform_pos  = glGetUniformLocation(program, "tex");
 
 	glUseProgram(program);
 	
@@ -64,6 +66,9 @@ void Viewport::run(float delta_time) {
 		projection * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, fill.y, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(fill.x, (fill.y - fillsize.y) / 2, 1)),
 	};
 	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glUniform1i(texture_uniform_pos, 0);
 	glUniform4fv(glGetUniformLocation(program, "color"), 1, (GLfloat*)&blend_color);
 	for(int i = 0; i < 4; ++i) {
 		glUniformMatrix4fv(mvp_uniform_pos, 1, GL_FALSE, &border_transforms[i][0][0]);
@@ -72,7 +77,7 @@ void Viewport::run(float delta_time) {
 		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_indices);
 		glVertexAttribPointer(vertex_attr_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-		glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, m.index_count, GL_UNSIGNED_INT, 0);
 	}
 	
 }

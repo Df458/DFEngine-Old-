@@ -2,6 +2,7 @@
 #define DF_ASSET_MANAGER
 #include "Util.h"
 #include "Font.h"
+#include "Model.h"
 #include <inttypes.h>
 
 namespace df {
@@ -15,8 +16,8 @@ public:
 	GLuint getTexture(std::string id) { return textures[id]; }
 	GLuint getShader(std::string id)  { return shaders[id];  }
 	GLuint getProgram(std::string id) { return programs[id]; }
-	GLuint getDefaultUV()			  { return default_uv; }
-	std::pair<GLuint, GLuint> getModel(std::string id) { return models[id];   }
+	GLuint getDefaultUV()			  { return default_uv;   }
+	Model  getModel(std::string id)   { return models[id];   }
 
 	void loadFont(std::string path, Vec2d size);
 	void loadSound(std::string path);
@@ -32,7 +33,7 @@ protected:
 	std::map<std::string, GLuint> textures;
 	std::map<std::string, GLuint> shaders;
 	std::map<std::string, GLuint> programs;
-	std::map<std::string, std::pair<GLuint, GLuint>> models;
+	std::map<std::string, Model> models;
 	
 	FT_Library freetype_library;
 	GLuint default_uv;

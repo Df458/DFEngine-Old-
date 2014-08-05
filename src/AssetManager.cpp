@@ -9,33 +9,48 @@ AssetManager::AssetManager() {
 		-1.0f, -1.0f, 0.0f,
 		 1.0f, -1.0f, 0.0f,
 		-1.0f,  1.0f, 0.0f,
-		 1.0f,  1.0f, 0.0f,
+		 1.0f,  1.0f, 0.0f
 	};
 	static const GLfloat rect_uv_data[] = { 
 		 0.0f,  1.0f,
 		 1.0f,  1.0f,
 		 0.0f,  0.0f,
-		 1.0f,  0.0f,
+		 1.0f,  0.0f
 	};
 	static const GLuint rect_index_data[] = { 
-		0, 1, 2, 3
+		0, 1, 2,
+		1, 2, 3
 	};
 	
-	GLuint rect_model;
-	GLuint indices;
-	glGenBuffers(1, &rect_model);
-	glBindBuffer(GL_ARRAY_BUFFER, rect_model);
+	static const GLfloat color_tex_data[] = {
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f
+	} ;
+
+	Model default_model;
+	default_model.index_count = 6;
+	glGenBuffers(1, &default_model.vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, default_model.vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rect_vertex_data), rect_vertex_data, GL_STATIC_DRAW);
 	
-	glGenBuffers(1, &indices);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
+	glGenBuffers(1, &default_model.index_buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, default_model.index_buffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rect_index_data), rect_index_data, GL_STATIC_DRAW);
 	
-	models["default"] = std::pair<GLuint, GLuint> (rect_model, indices);
+	models["default"] = default_model;
 	
 	glGenBuffers(1, &default_uv);
 	glBindBuffer(GL_ARRAY_BUFFER, default_uv);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rect_uv_data), rect_uv_data, GL_STATIC_DRAW);
+	
+	GLuint default_texture;
+	glGenTextures(1, &default_texture);
+	glBindTexture(GL_TEXTURE_2D, default_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_UNSIGNED_BYTE, color_tex_data);
+	
+	textures["default"] = default_texture;
 	
 	loadShader("default.vert", false);
 	loadShader("default.frag");
@@ -299,4 +314,55 @@ void AssetManager::compileProgram(std::string program_id, std::vector<std::strin
 		glAttachShader(new_program, getShader(s));
 	glLinkProgram(new_program);
 	programs[program_id] = new_program;
+}
+
+void AssetManager::loadModel(std::string path) {
+	std::string fname = path;
+	path = getPath().append("/data/models/" + path);
+	Model model;
+	std::vector<GLfloat> verts;
+	std::vector<GLuint>  indices;
+	std::vector<GLuint>  uvs;
+	
+	FILE* infile = fopen(path.c_str(), "r");
+	while(!feof(infile)) {
+		char ch = fgetc(infile);
+		switch(ch) {
+			case 'v': {
+				GLfloat vert[3] = {0, 0, 0};
+				if(fscanf(infile, "%f %f %f\n", &vert[0], &vert[1], &vert[2]) != 3)
+					std::cerr << "Read Error\n";
+				verts.push_back(vert[0]);
+				verts.push_back(vert[1]);
+				verts.push_back(vert[2]);
+				//std::cerr << "vert: " << vert[0] << ", " << vert[1] << ", " << vert[2] << "\n";
+			} break;
+			
+			case 'f': {
+				GLuint index[3] = {0, 0, 0};
+				if(fscanf(infile, "%u %u %u\n", &index[0], &index[1], &index[2]) != 3)
+					std::cerr << "Read Error\n";
+				indices.push_back(index[0] - 1);
+				indices.push_back(index[1] - 1);
+				indices.push_back(index[2] - 1);
+				//std::cerr << "index: " << index[0] << ", " << index[1] << ", " << index[2] << "\n";
+			} break;
+			
+			default:
+				char testchar;
+				while((testchar = fgetc(infile)) && testchar != '\n' && testchar != '\0');
+				//std::cerr << "N/A\n";
+		}
+	}
+	fclose(infile);
+	model.index_count = indices.size();
+	glGenBuffers(1, &model.vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, model.vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW);
+	
+	glGenBuffers(1, &model.index_buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model.index_buffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+	
+	models[fname] = model;
 }

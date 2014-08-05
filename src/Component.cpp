@@ -8,6 +8,7 @@ GraphicsComponent::GraphicsComponent() {
 	program = game->getAssetManager()->getProgram("default");
 	uv = game->getAssetManager()->getDefaultUV();
 	model = game->getAssetManager()->getModel("default");
+	texture = game->getAssetManager()->getTexture("default");
 }
 
 void GraphicsComponent::_runSub(float delta_time) {
@@ -44,14 +45,13 @@ void GraphicsComponent::_runSub(float delta_time) {
 	glUniform4fv(color_uniform_pos, 1, (GLfloat*)&blend_color);
 	
 	glEnableVertexAttribArray(vertex_attr_pos);
-	glBindBuffer(GL_ARRAY_BUFFER, model.first);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model.second);
+	glBindBuffer(GL_ARRAY_BUFFER, model.vertex_buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model.index_buffer);
 	glVertexAttribPointer(vertex_attr_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(uv_attr_pos);
 	glBindBuffer(GL_ARRAY_BUFFER, uv);
 	glVertexAttribPointer(uv_attr_pos, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, model.index_count, GL_UNSIGNED_INT, 0);
 
 	glDisableVertexAttribArray(vertex_attr_pos);
 	glDisableVertexAttribArray(uv_attr_pos);

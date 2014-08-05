@@ -107,6 +107,11 @@ static int lua_loadShader(lua_State* ls) {
 	return 0;
 }
 
+static int lua_loadModel(lua_State* ls) {
+	game->getAssetManager()->loadModel(lua_tostring(ls, 1));
+	return 0;
+}
+
 static int lua_createProgram(lua_State* ls) {
 	int arg_count = lua_gettop(ls);
 	std::string program_id = lua_tostring(ls, 1);
@@ -226,6 +231,8 @@ static int lua_addComponent(lua_State* ls) {
 		
 		case COMPONENT_GRAPHICS: {
 			GraphicsComponent* cmp_dat = new GraphicsComponent;
+			if(arg_count >= 3)
+				cmp_dat->model = game->getAssetManager()->getModel(lua_tostring(ls, 3));
 			game->addComponent(id, cmp_dat, component_type_str[component_type]);
 		} break;
 		
@@ -433,6 +440,7 @@ static const luaL_reg lua_game_functions[] = {
 	{"loadFont", lua_loadFont},
 	{"loadSound", lua_loadSound},
 	{"loadShader", lua_loadShader},
+	{"loadModel", lua_loadModel},
 	{"createProgram", lua_createProgram},
 	{"addForce", lua_addForce},
 	{"setUniformProgramData", lua_setUniformProgramData},
