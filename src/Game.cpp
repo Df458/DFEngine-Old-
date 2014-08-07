@@ -4,6 +4,7 @@
 #include "Component.h"
 #include "Tween.h"
 #include "Game.h"
+#include "Window.h"
 
 using namespace df;
 
@@ -88,6 +89,10 @@ void Game::addTweenSelf(std::string target_field, float target_value, float targ
 	_tweens.push_back(t);
 }
 
+void Game::setWindow(Window* w) {
+	main_window = w;
+}
+
 void Game::run(float delta_time) {
 	_time_passed += delta_time;
 	if(_time_passed >= FPS) {
@@ -126,6 +131,8 @@ void Game::run(float delta_time) {
 		else if(keyboard_keys[i] == 1)
 			keyboard_keys[i] = 3;
 	}
+	
+	main_window->run(delta_time);
 }
 
 void Game::insertData(lua_State* ls) {
@@ -134,6 +141,8 @@ void Game::insertData(lua_State* ls) {
 		std::cerr << "ERROR: Failed to insert game data!\n";
 		exit(1);
 	}
+	lua_pushstring(ls, title.c_str());
+	lua_setfield(ls, -2, "window_title");
 	lua_setglobal(ls, "gamedata");
 	luaL_unref(ls, LUA_REGISTRYINDEX, data_reference);
 	
@@ -157,6 +166,11 @@ void Game::retrieveData(lua_State* ls) {
 	lua_pop(ls, 1);
 	
 	lua_getglobal(ls, "gamedata");
+	lua_getfield(ls, -1, "window_title");
+	title = lua_tostring(ls, -1);
+	if(main_window && main_window->getTitle() != title)
+		main_window->setTitle(title);
+	lua_pop(ls, 1);
 	data_reference = luaL_ref(ls, LUA_REGISTRYINDEX);
 	if(data_reference == LUA_REFNIL) {
 		std::cerr << "ERROR: Failed to retrieve game data!\n";

@@ -23,7 +23,6 @@ int main(int argc, char** argv) {
 		glfwTerminate();
 		return -1;
 	}
-	window.setTitle("DFEngine Window");
 	
 	Viewport* view1 = new Viewport();
 	view1->setFill(true);
@@ -40,13 +39,13 @@ int main(int argc, char** argv) {
 	
 	game = new Game();
 	game->init();
+	game->setWindow(&window);
 	glfwSetTime(0);
 
 	while(window.exists()) {
 		float dt = glfwGetTime() * FPS;
 		glfwSetTime(0);
 		game->run(dt);
-		window.run(dt);
 		glfwPollEvents();
 	}
 	game->cleanup();

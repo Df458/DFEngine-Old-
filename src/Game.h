@@ -8,6 +8,7 @@
 
 namespace df{
 class StorageComponent;
+class Window;
 
 class Game {
 public:
@@ -45,6 +46,7 @@ public:
 	lua_State* getState() { return game_state; }
 	glm::mat4 getCameraView() { return view; }
 	glm::mat4 getCameraProjection() { return projection; }
+	void setWindow(Window* w);
 	friend Entity::Entity(unsigned);
 	friend void Entity::destroy();
 protected:
@@ -76,6 +78,8 @@ protected:
 	
 	lua_State* game_state;
 	glm::mat4 view, projection;
+	Window* main_window;
+	std::string title = "DFEngine";
 };
 
 extern Game* game;

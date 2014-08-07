@@ -4,7 +4,7 @@
 using namespace df;
 
 Window::Window() {
-	window = glfwCreateWindow(800, 600, "Day of the Hotdog", NULL, NULL);
+	window = glfwCreateWindow(800, 600, "DFEngine Window", NULL, NULL);
 	init = window;
 	
 	if(init) {
