@@ -6,7 +6,6 @@ using namespace df;
 GraphicsComponent::GraphicsComponent() {
 	color = Vec3d(1, 1, 1);
 	program = game->getAssetManager()->getProgram("default");
-	uv = game->getAssetManager()->getDefaultUV();
 	model = game->getAssetManager()->getModel("default");
 	texture = game->getAssetManager()->getTexture("default");
 }
@@ -21,7 +20,6 @@ void GraphicsComponent::_runSub(float delta_time) {
 	btTransform trans;
 	float gltransform[16];
 	state->getWorldTransform(trans);
-	
 	glm::mat4 model_transform = 
 	glm::translate(glm::mat4(1.0f), glm::vec3(trans.getOrigin().getX() * 10, trans.getOrigin().getY() * 10, trans.getOrigin().getZ() * 10)) *
 	glm::rotate(glm::mat4(1.0f), trans.getRotation().getAngle(), glm::vec3(trans.getRotation().getAxis().getX(), trans.getRotation().getAxis().getY(), trans.getRotation().getAxis().getZ())) *
@@ -49,7 +47,7 @@ void GraphicsComponent::_runSub(float delta_time) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model.index_buffer);
 	glVertexAttribPointer(vertex_attr_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(uv_attr_pos);
-	glBindBuffer(GL_ARRAY_BUFFER, uv);
+	glBindBuffer(GL_ARRAY_BUFFER, model.uv_buffer);
 	glVertexAttribPointer(uv_attr_pos, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glDrawElements(GL_TRIANGLES, model.index_count, GL_UNSIGNED_INT, 0);
 

@@ -39,11 +39,11 @@ AssetManager::AssetManager() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, default_model.index_buffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rect_index_data), rect_index_data, GL_STATIC_DRAW);
 	
-	models["default"] = default_model;
-	
 	glGenBuffers(1, &default_uv);
 	glBindBuffer(GL_ARRAY_BUFFER, default_uv);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rect_uv_data), rect_uv_data, GL_STATIC_DRAW);
+	
+	default_model.uv_buffer = default_uv;
 	
 	GLuint default_texture;
 	glGenTextures(1, &default_texture);
@@ -51,6 +51,7 @@ AssetManager::AssetManager() {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_UNSIGNED_BYTE, color_tex_data);
 	
 	textures["default"] = default_texture;
+	models["default"] = default_model;
 	
 	loadShader("default.vert", false);
 	loadShader("default.frag");
@@ -322,29 +323,43 @@ void AssetManager::loadModel(std::string path) {
 	Model model;
 	std::vector<GLfloat> verts;
 	std::vector<GLuint>  indices;
-	std::vector<GLuint>  uvs;
+	std::vector<GLuint>  uv_indices;
+	std::vector<GLfloat>  uv_pos;
 	
 	FILE* infile = fopen(path.c_str(), "r");
 	while(!feof(infile)) {
 		char ch = fgetc(infile);
 		switch(ch) {
 			case 'v': {
-				GLfloat vert[3] = {0, 0, 0};
-				if(fscanf(infile, "%f %f %f\n", &vert[0], &vert[1], &vert[2]) != 3)
-					std::cerr << "Read Error\n";
-				verts.push_back(vert[0]);
-				verts.push_back(vert[1]);
-				verts.push_back(vert[2]);
-				//std::cerr << "vert: " << vert[0] << ", " << vert[1] << ", " << vert[2] << "\n";
+				if(fgetc(infile) == 't') {
+					GLfloat pos[2] = {0, 0};
+					if(fscanf(infile, "%f %f\n", &pos[0], &pos[1]) != 2)
+						std::cerr << "Read Error\n";
+					uv_pos.push_back(pos[0]);
+					uv_pos.push_back(pos[1]);
+				} else {
+					fseek(infile, -1, SEEK_CUR);
+					GLfloat vert[3] = {0, 0, 0};
+					if(fscanf(infile, "%f %f %f\n", &vert[0], &vert[1], &vert[2]) != 3)
+						std::cerr << "Read Error\n";
+					verts.push_back(vert[0]);
+					verts.push_back(vert[1]);
+					verts.push_back(vert[2]);
+					//std::cerr << "vert: " << vert[0] << ", " << vert[1] << ", " << vert[2] << "\n";
+				}
 			} break;
 			
 			case 'f': {
 				GLuint index[3] = {0, 0, 0};
-				if(fscanf(infile, "%u %u %u\n", &index[0], &index[1], &index[2]) != 3)
+				GLuint uv_index[3] = {0, 0, 0};
+				if(fscanf(infile, "%u/%u %u/%u %u/%u\n", &index[0], &uv_index[0], &index[1], &uv_index[1], &index[2], &uv_index[2]) != 6)
 					std::cerr << "Read Error\n";
 				indices.push_back(index[0] - 1);
 				indices.push_back(index[1] - 1);
 				indices.push_back(index[2] - 1);
+				uv_indices.push_back(uv_index[0] - 1);
+				uv_indices.push_back(uv_index[1] - 1);
+				uv_indices.push_back(uv_index[2] - 1);
 				//std::cerr << "index: " << index[0] << ", " << index[1] << ", " << index[2] << "\n";
 			} break;
 			
@@ -354,15 +369,28 @@ void AssetManager::loadModel(std::string path) {
 				//std::cerr << "N/A\n";
 		}
 	}
+	
+	GLfloat* final_verts = new GLfloat[uv_indices.size() * 3];
+	for(unsigned i = 0; i < uv_indices.size(); ++i) {
+		final_verts[uv_indices[i] * 3] = verts[indices[i] * 3];
+		final_verts[uv_indices[i] * 3 + 1] = verts[indices[i] * 3 + 1];
+		final_verts[uv_indices[i] * 3 + 2] = verts[indices[i] * 3 + 2];
+	}
+	
 	fclose(infile);
 	model.index_count = indices.size();
 	glGenBuffers(1, &model.vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, model.vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(GLfloat), &verts[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, uv_indices.size() * 3 *sizeof(GLfloat), &final_verts[0], GL_STATIC_DRAW);
 	
 	glGenBuffers(1, &model.index_buffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model.index_buffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, uv_indices.size() * sizeof(GLuint), &uv_indices[0], GL_STATIC_DRAW);
+	
+	glGenBuffers(1, &model.uv_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, model.uv_buffer);
+	glBufferData(GL_ARRAY_BUFFER, uv_pos.size() * sizeof(GLfloat), &uv_pos[0], GL_STATIC_DRAW);
+	//model.uv_buffer = default_uv;
 	
 	models[fname] = model;
 }

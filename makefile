@@ -1,6 +1,6 @@
 PKGCONFIG=pkg-config
 OS=GNU/Linux
-CXXFLAGS=-I../src -std=c++11 -O3 -g -pg -Wall -Wno-literal-suffix -Wno-unused-variable -pedantic-errors `$(PKGCONFIG) --cflags glew glfw3 freetype2 lua5.1 bullet openal`
+CXXFLAGS=-I../src -std=c++11 -O3 -pipe -g -pg -Wall -Wno-literal-suffix -Wno-unused-variable -pedantic-errors `$(PKGCONFIG) --cflags glew glfw3 freetype2 lua5.1 bullet openal`
 WINFLAGS=-Wl,-subsystem,windows -static-libgcc -static-libstdc++ -I/usr/i686-w64-mingw32/include/freetype2 -I/usr/i686-w64-mingw32/include/freetype2/freetype -DWINDOWS
 LINUXFLAGS=
 CPPLIBS=-L. -Wl,-rpath -Wl,./lib

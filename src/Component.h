@@ -127,6 +127,18 @@ public:
 		lua_setfield(ls, -2, "position");
 		
 		lua_newtable(ls);
+		lua_pushnumber(ls, trans.getRotation().getAxis().getX());
+		lua_setfield(ls, -2, "x");
+		lua_pushnumber(ls, trans.getRotation().getAxis().getY());
+		lua_setfield(ls, -2, "y");
+		lua_pushnumber(ls, trans.getRotation().getAxis().getZ());
+		lua_setfield(ls, -2, "z");
+		lua_pushnumber(ls, trans.getRotation().getW());
+		lua_setfield(ls, -2, "w");
+
+		lua_setfield(ls, -2, "rotation");
+		
+		lua_newtable(ls);
 		lua_pushnumber(ls, linear_vel.getX());
 		lua_setfield(ls, -2, "x");
 		lua_pushnumber(ls, linear_vel.getY());
@@ -192,11 +204,20 @@ public:
 		lua_getfield(ls, -2, "y");
 		lua_getfield(ls, -3, "z");
 		trans.setOrigin(btVector3(lua_tonumber(ls, -3), lua_tonumber(ls, -2),lua_tonumber(ls, -1)));
-		if(trans.getOrigin() != old_trans.getOrigin()) {
+		lua_pop(ls, 4);
+		
+		/*lua_getfield(ls, -1, "rotation");
+		lua_getfield(ls, -1, "x");
+		lua_getfield(ls, -2, "y");
+		lua_getfield(ls, -3, "z");
+		lua_getfield(ls, -4, "w");
+		trans.setRotation(btQuaternion(btVector3(lua_tonumber(ls, -4), lua_tonumber(ls, -3),lua_tonumber(ls, -2)), lua_tonumber(ls, -1)));
+		lua_pop(ls, 5);*/
+		
+		if(trans.getOrigin() != old_trans.getOrigin() || trans.getRotation() != old_trans.getRotation()) {
 			body->getMotionState()->setWorldTransform(trans);
 			body->setWorldTransform(trans);
 		}
-		lua_pop(ls, 4);
 		
 		lua_getfield(ls, -1, "velocity");
 		lua_getfield(ls, -1, "x");

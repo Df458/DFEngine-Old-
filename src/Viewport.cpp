@@ -19,6 +19,8 @@ void Viewport::run(float delta_time) {
 	glLoadIdentity();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
 	float ratio = self_size.x / self_size.y;
 	//float viewscale = self_size.x / game->getViewSize().x < self_size.y / game->getViewSize().y ? self_size.x / game->getViewSize().x : self_size.y / game->getViewSize().y;
@@ -35,7 +37,7 @@ void Viewport::run(float delta_time) {
 	rotation = game->getCameraRotate();
 	scale = game->getCameraScale();
 	
-	glm::mat4 projection = glm::ortho(0.0f, fill.x, fill.y, 0.0f, -1.0f, 1.0f);
+	glm::mat4 projection = glm::ortho(0.0f, fill.x, fill.y, 0.0f, -100.0f, 100.0f);
 	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(translation.x + (fill.x - fillsize.x) / 2, translation.y + (fill.y - fillsize.y) / 2, translation.z)) * 
 	glm::rotate(glm::mat4(1.0f), rotation.x, glm::vec3(1.0f, 0.0f, 0.0f)) * 
 	glm::rotate(glm::mat4(1.0f), rotation.y, glm::vec3(0.0f, 1.0f, 0.0f)) * 
