@@ -1,5 +1,6 @@
 #include "System.h"
 #include "Game.h"
+#include "Component.h"
 
 using namespace df;
 
@@ -16,6 +17,10 @@ void GraphicsSystem::run(float delta_time) {
 		
 		gfx_cmp.second->run(delta_time);
 	}
+}
+
+void GraphicsSystem::remove(unsigned id) {
+    _components.erase(id);
 }
 
 PhysicsSystem::PhysicsSystem() {
@@ -115,6 +120,13 @@ void PhysicsSystem::run(float delta_time) {
 	}
 }
 
+void PhysicsSystem::remove(unsigned id) {
+    if(_components.find(id) != _components.end()) {
+	_world->removeRigidBody(_components[id]->body);
+	_components.erase(id);
+    }
+}
+
 bool TimerSystem::addComponent(unsigned id, Component* component){
 	_components[id] = (TimerComponent*)component;
 	return true;
@@ -124,4 +136,8 @@ void TimerSystem::run(float delta_time) {
 	for(auto tmr_cmp : _components) {
 		tmr_cmp.second->run(delta_time);
 	}
+}
+
+void TimerSystem::remove(unsigned id) {
+    _components.erase(id);
 }

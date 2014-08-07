@@ -1,6 +1,15 @@
+#include "AssetManager.h"
+#include "LuaFunctions.h"
+#include "Entity.h"
+#include "Component.h"
+#include "Tween.h"
 #include "Game.h"
 
 using namespace df;
+
+AssetManager* Game::getAssetManager() {
+	return &asset_library;
+}
 
 void Game::init() {
 	_view_size = Vec2d(800, 600);
@@ -38,6 +47,10 @@ void Game::cleanup() {
 		delete e.second;
 	}
 	delete storage;
+}
+
+void Game::addTween(Tween<float> t) {
+	_tweens.push_back(t);
 }
 
 void Game::addTweenSelf(std::string target_field, float target_value, float target_time, int itype, int etype) {

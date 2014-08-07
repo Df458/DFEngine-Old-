@@ -1,9 +1,12 @@
 #ifndef DF_SYSTEM
 #define DF_SYSTEM
 #include "Util.h"
-#include "Component.h"
 
 namespace df {
+class Component;
+class GraphicsComponent;
+class PhysicsComponent;
+class TimerComponent;
 
 class System {
 public:
@@ -17,7 +20,7 @@ public:
 	GraphicsSystem();
 	void run(float delta_time);
 	bool addComponent(unsigned id, Component* component);
-	void remove(unsigned id) { _components.erase(id); }
+	void remove(unsigned id);
 protected:
 	std::map<unsigned, GraphicsComponent*> _components;
 };
@@ -28,7 +31,7 @@ public:
 	~PhysicsSystem();
 	void run(float delta_time);
 	bool addComponent(unsigned id, Component* component);
-	void remove(unsigned id) { if(_components.find(id) != _components.end()){ _world->removeRigidBody(_components[id]->body); _components.erase(id);} }
+	void remove(unsigned id);
 protected:
 	std::map<unsigned, PhysicsComponent*> _components;
 	btBroadphaseInterface* _broad_phase;
@@ -44,7 +47,7 @@ public:
 	TimerSystem() {}
 	void run(float delta_time);
 	bool addComponent(unsigned id, Component* component);
-	void remove(unsigned id) { _components.erase(id); }
+	void remove(unsigned id);
 protected:
 	std::map<unsigned, TimerComponent*> _components;
 };

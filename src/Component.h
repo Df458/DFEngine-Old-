@@ -1,8 +1,8 @@
 #ifndef DF_COMPONENT
 #define DF_COMPONENT
 #include "Util.h"
-#include "Tween.h"
 #include "Model.h"
+
 namespace df {
 
 class Entity;

@@ -1,5 +1,6 @@
 #include "Font.h"
 #include "Game.h"
+#include "Model.h"
 
 using namespace df;
 

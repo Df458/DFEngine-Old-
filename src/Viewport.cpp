@@ -1,4 +1,6 @@
 #include "Viewport.h"
+#include "Model.h"
+#include "Game.h"
 
 using namespace df;
 

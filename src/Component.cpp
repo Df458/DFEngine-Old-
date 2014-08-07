@@ -1,5 +1,7 @@
 #include "Component.h"
 #include "Game.h"
+#include "Tween.h"
+#include "Model.h"
 
 using namespace df;
 

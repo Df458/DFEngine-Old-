@@ -1,4 +1,6 @@
 #include "AssetManager.h"
+#include "Font.h"
+#include "Model.h"
 
 using namespace df;
 
@@ -63,6 +65,34 @@ AssetManager::AssetManager() {
 
 AssetManager::~AssetManager() {
 	cleanup();
+}
+
+Font*  AssetManager::getFont(std::string id) {
+	return &fonts[id];
+}
+
+ALuint AssetManager::getSound(std::string id) {
+	return sounds[id];
+}
+
+GLuint AssetManager::getTexture(std::string id) {
+	return textures[id];
+}
+
+GLuint AssetManager::getShader(std::string id) {
+	return shaders[id];
+}
+
+GLuint AssetManager::getProgram(std::string id) {
+	return programs[id];
+}
+
+GLuint AssetManager::getDefaultUV()	{
+	return default_uv;
+}
+
+Model  AssetManager::getModel(std::string id) {
+	return models[id];
 }
 
 void AssetManager::cleanup() {

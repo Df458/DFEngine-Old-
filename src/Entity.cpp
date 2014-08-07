@@ -1,5 +1,6 @@
 #include "Entity.h"
 #include "Game.h"
+#include "Component.h"
 using namespace df;
 
 Entity::Entity(unsigned id) {
@@ -19,6 +20,86 @@ Entity::~Entity() {
 	for(auto i : _components) {
 		delete i.second;
 	}
+}
+
+Component* Entity::getComponent(std::string cmp_id) {
+	if (_components.find(cmp_id) != _components.end())
+		return _components[cmp_id];
+	return NULL;
+}
+
+void Entity::setComponent(std::string cmp_id, Component* cmp) {
+	cmp->_owner_id = _id;
+	_components[cmp_id] = cmp;
+}
+
+bool Entity::getAlive() {
+	return _is_alive;
+}
+
+void Entity::setAlive(bool alive) {
+	_to_destroy = !alive;
+}
+
+bool Entity::getDestroyed() {
+	return _to_destroy;
+}
+
+bool Entity::getPersist() {
+	return persist;
+}
+
+unsigned Entity::getId() {
+	return _id;
+}
+
+unsigned Entity::getType() {
+	return type;
+}
+
+void Entity::reset() {
+	_is_alive = true;
+	_to_create = true;
+	for(auto i : _components) {
+		delete i.second;
+	}
+	_components.clear();
+	_components["storage"] = new StorageComponent;
+	_create_script.clear();
+	_update_script.clear();
+	_collide_script.clear();
+	_draw_script.clear();
+}
+std::string Entity::getUpScr() {
+	return _update_script;
+}
+
+void Entity::setUpScr(std::string scr) {
+	_update_script = scr;
+}
+
+std::string Entity::getColScr() {
+	return _collide_script;
+}
+
+void Entity::setColScr(std::string scr) {
+	_collide_script = scr;
+}
+
+void Entity::setCreScr(std::string scr) {
+	_create_script = scr;
+}
+
+std::string Entity::getCreScr() {
+	return _create_script;
+}
+
+void Entity::setDrawScr(std::string scr) {
+	_draw_script = scr;
+}
+
+std::string Entity::getDrawScr() {
+	return _draw_script;
 }
 
 void Entity::destroy() {

@@ -1,23 +1,24 @@
 #ifndef DF_ASSET_MANAGER
 #define DF_ASSET_MANAGER
 #include "Util.h"
-#include "Font.h"
-#include "Model.h"
 #include <inttypes.h>
 
 namespace df {
+struct Model;
+struct Font;
+
 class AssetManager {
 public:
 	AssetManager();
 	~AssetManager();
 	
-	Font*  getFont(std::string id) 	  { return &fonts[id];   }
-	ALuint getSound(std::string id)   { return sounds[id];   }
-	GLuint getTexture(std::string id) { return textures[id]; }
-	GLuint getShader(std::string id)  { return shaders[id];  }
-	GLuint getProgram(std::string id) { return programs[id]; }
-	GLuint getDefaultUV()			  { return default_uv;   }
-	Model  getModel(std::string id)   { return models[id];   }
+	Font*  getFont(std::string id);
+	ALuint getSound(std::string id);
+	GLuint getTexture(std::string id);
+	GLuint getShader(std::string id);
+	GLuint getProgram(std::string id);
+	GLuint getDefaultUV();
+	Model  getModel(std::string id);
 
 	void loadFont(std::string path, Vec2d size);
 	void loadSound(std::string path);

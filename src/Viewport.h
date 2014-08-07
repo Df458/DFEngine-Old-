@@ -2,7 +2,6 @@
 #define DF_VIEWPORT
 #include "Util.h"
 #include "Widget.h"
-#include "Game.h"
 
 namespace df {
 
