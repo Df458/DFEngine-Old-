@@ -168,7 +168,7 @@ void Game::retrieveData(lua_State* ls) {
 	lua_getglobal(ls, "gamedata");
 	lua_getfield(ls, -1, "window_title");
 	title = lua_tostring(ls, -1);
-	if(main_window && main_window->getTitle() != title)
+	if(main_window != NULL)
 		main_window->setTitle(title);
 	lua_pop(ls, 1);
 	data_reference = luaL_ref(ls, LUA_REGISTRYINDEX);

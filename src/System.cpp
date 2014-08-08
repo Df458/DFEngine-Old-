@@ -31,6 +31,7 @@ PhysicsSystem::PhysicsSystem() {
 	_solver = new btSequentialImpulseConstraintSolver;
 	_world = new btDiscreteDynamicsWorld(_collision_dispatch, _broad_phase, _solver, _collision_config);
 	_world->setGravity(btVector3(0, 10, 0));
+	_world->setInternalTickCallback(physicsTickCallback, &collision_manifolds);
 }
 
 PhysicsSystem::~PhysicsSystem() {
@@ -49,18 +50,17 @@ bool PhysicsSystem::addComponent(unsigned id, Component* component){
 }
 
 void PhysicsSystem::run(float delta_time) {
+	collision_manifolds.clear();
 	_world->stepSimulation(delta_time / FPS, 10);
-	btTransform trans;
 	
-	int manifold_count = _world->getDispatcher()->getNumManifolds();
-	for(int i = 0; i < manifold_count; ++i) {
-		btPersistentManifold* contactManifold = _world->getDispatcher()->getManifoldByIndexInternal(i);
-		bool collided = false;
+	for(unsigned i = 0; i < collision_manifolds.size(); ++i) {
+		btPersistentManifold* contactManifold = collision_manifolds[i];
+/*		bool collided = false;
 		for(int i = 0; i < contactManifold->getNumContacts(); ++i)
 			if(contactManifold->validContactDistance(contactManifold->getContactPoint(i)))
 				collided = true;
 		if(!collided)
-			continue;
+			continue;*/
 		
 		const btCollisionObject* object0 = contactManifold->getBody0();
 		const btCollisionObject* object1 = contactManifold->getBody1();
@@ -69,16 +69,6 @@ void PhysicsSystem::run(float delta_time) {
 		Entity* ob2 = game->getEntity((*(int*)object1->getUserPointer()));
 		lua_State* s1;
 		lua_State* s2;
-		/*s1 = luaL_newstate();
-		luaL_openlibs(s1);
-		luaL_openlib(s1, "game", lua_game_functions, 0);
-		lua_insertpath(s1);
-		s2 = luaL_newstate();
-		luaL_openlibs(s2);
-		luaL_openlib(s2, "game", lua_game_functions, 0);
-		lua_insertpath(s2);*/
-		
-		
 		
 		if(!ob1->getColScr().empty()) {
 			s1 = game->getState();
@@ -122,9 +112,20 @@ void PhysicsSystem::run(float delta_time) {
 
 void PhysicsSystem::remove(unsigned id) {
     if(_components.find(id) != _components.end()) {
-	_world->removeRigidBody(_components[id]->body);
-	_components.erase(id);
+		_world->removeRigidBody(_components[id]->body);
+		_components.erase(id);
     }
+}
+
+void df::physicsTickCallback(btDynamicsWorld *world, btScalar timeStep) {
+	int manifold_count = world->getDispatcher()->getNumManifolds();
+	
+	std::vector<btPersistentManifold*>* collision_manifolds = (std::vector<btPersistentManifold*>*) world->getWorldUserInfo();
+	
+	for(int i = 0; i < manifold_count; ++i) {
+		btPersistentManifold* contactManifold = world->getDispatcher()->getManifoldByIndexInternal(i);
+		collision_manifolds->push_back(contactManifold);
+	}
 }
 
 bool TimerSystem::addComponent(unsigned id, Component* component){

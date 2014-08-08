@@ -40,7 +40,10 @@ protected:
 	btSequentialImpulseConstraintSolver* _solver;
 	btDiscreteDynamicsWorld* _world;
 	btRigidBody* _test_sphere;
+	std::vector<btPersistentManifold*> collision_manifolds;
 };
+
+void physicsTickCallback(btDynamicsWorld *world, btScalar timeStep);
 
 class TimerSystem : public System {
 public:

@@ -78,7 +78,7 @@ protected:
 	
 	lua_State* game_state;
 	glm::mat4 view, projection;
-	Window* main_window;
+	Window* main_window = NULL;
 	std::string title = "DFEngine";
 };
 
