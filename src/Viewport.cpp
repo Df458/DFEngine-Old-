@@ -48,7 +48,7 @@ void Viewport::run(float delta_time) {
 	
 	game->draw(delta_time, view, projection);
 
-	
+	glDisable(GL_DEPTH_TEST);
 
 	Model m = game->getAssetManager()->getModel("default");
 	GLuint program = game->getAssetManager()->getProgram("default");
@@ -121,8 +121,13 @@ void Viewport::mouseMoveEvent(Vec2d self_position) {
 	if(!is_active)
 		return;
 	
+	//Size of the viewport in the window
 	Vec2d self_size = requestSize();
+	
+	//Scale factor of the game view drawn in the viewport
 	float viewscale = self_size.x / game->getViewSize().x < self_size.y / game->getViewSize().y ? self_size.x / game->getViewSize().x : self_size.y / game->getViewSize().y;
+	
+	//Size of the scaled-down game view in the viewport
 	Vec2d fill = Vec2d(game->getViewSize().x * viewscale, game->getViewSize().y * viewscale);
 
 	self_position.x = clamp((self_position.x - (self_size.x - fill.x) / 2) / fill.x, 0, 1);

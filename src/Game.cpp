@@ -12,6 +12,10 @@ AssetManager* Game::getAssetManager() {
 	return &asset_library;
 }
 
+void Game::setMousePosition(Vec2d mp) {
+	_mouse_position = mp;
+}
+
 void Game::init() {
 	_view_size = Vec2d(800, 600);
 	storage = new StorageComponent();
@@ -151,6 +155,7 @@ void Game::insertData(lua_State* ls) {
 	insertVec3d(ls, "rot", cam_rotate);
 	insertVec3d(ls, "scale", cam_scale);
 	insertVec3d(ls, "color", bg_color);
+	insertVec2d(ls, "view_size", _view_size);
 	lua_setglobal(ls, "camera");
 	
 	lua_pushstring(ls, getPath().c_str());
@@ -163,6 +168,7 @@ void Game::retrieveData(lua_State* ls) {
 	retrieveVec3d(ls, "rot", cam_rotate);
 	retrieveVec3d(ls, "scale", cam_scale);
 	retrieveVec3d(ls, "color", bg_color);
+	retrieveVec2d(ls, "view_size", _view_size);
 	lua_pop(ls, 1);
 	
 	lua_getglobal(ls, "gamedata");
