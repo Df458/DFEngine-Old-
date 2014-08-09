@@ -29,7 +29,7 @@ public:
 	Vec3d getBg() { return bg_color; }
 	unsigned char* getMouseButtons() { return _mouse_buttons; }
 	unsigned char* getKeyboardKeys() { return keyboard_keys; }
-	void setMousePosition(Vec2d mp) { _mouse_position = mp; }
+	void setMousePosition(Vec2d mp);
 	AssetManager* getAssetManager();
 	unsigned generateId();
 	void addComponent(unsigned entity_id, Component* cmp, std::string cmp_id);
