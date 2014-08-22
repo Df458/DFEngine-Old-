@@ -9,35 +9,35 @@
 using namespace df;
 
 AssetManager* Game::getAssetManager() {
-	return &asset_library;
+    return &asset_library;
 }
 
 void Game::setMousePosition(Vec2d mp) {
-	_mouse_position = mp;
+    _mouse_position = mp;
 }
 
 void Game::init() {
-	_view_size = Vec2d(800, 600);
-	storage = new StorageComponent();
-	
-	_audio_device = alcOpenDevice(NULL);
-	_audio_context = alcCreateContext(_audio_device, NULL);
-	alcMakeContextCurrent(_audio_context);
-	alListener3f(AL_POSITION, 0, 0, 0);
-	alListener3f(AL_VELOCITY, 0, 0, 0);
-	alListener3f(AL_ORIENTATION, 0, 0, -1);
-	
-	game_state = luaL_newstate();
-	luaL_openlibs(game_state);
-	luaL_openlib(game_state, "game", lua_game_functions, 0);
-	lua_pop(game_state, 1);
-	lua_insertpath(game_state);
-	
-	lua_newtable(game_state);
-	lua_pushstring(game_state, getPath().c_str());
-	lua_setfield(game_state, -2, "datapath");
-	data_reference = luaL_ref(game_state, LUA_REGISTRYINDEX);
+    _view_size = Vec2d(800, 600);
+    storage = new StorageComponent();
     
+    _audio_device = alcOpenDevice(NULL);
+    _audio_context = alcCreateContext(_audio_device, NULL);
+    alcMakeContextCurrent(_audio_context);
+    alListener3f(AL_POSITION, 0, 0, 0);
+    alListener3f(AL_VELOCITY, 0, 0, 0);
+    alListener3f(AL_ORIENTATION, 0, 0, -1);
+    
+    game_state = luaL_newstate();
+    luaL_openlibs(game_state);
+    luaL_openlib(game_state, "game", lua_game_functions, 0);
+    lua_pop(game_state, 1);
+    lua_insertpath(game_state);
+    
+    lua_newtable(game_state);
+    lua_pushstring(game_state, getPath().c_str());
+    lua_setfield(game_state, -2, "datapath");
+    data_reference = luaL_ref(game_state, LUA_REGISTRYINDEX);
+
     insertData(game_state);
 	luaL_loadfile(game_state, (getPath() + "/data/scripts/" + "init.lua").c_str());
 	if(lua_pcall(game_state, 0, LUA_MULTRET, 0))

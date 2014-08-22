@@ -66,57 +66,57 @@ void Font::cleanup() {
 }
 
 void Font::draw(std::string text, Vec3d position, Vec3d rotation, Vec3d scale, Vec3d color, float alpha) {
-	GLuint program = game->getAssetManager()->getProgram("default");
-	glUseProgram(program);
-	
-	glm::mat4 global_transform = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, position.z)) *
-	glm::rotate(glm::mat4(1.0f), rotation.x, glm::vec3(1, 0, 0)) * glm::rotate(glm::mat4(1.0f), rotation.y, glm::vec3(0, 1, 0)) * glm::rotate(glm::mat4(1.0f), rotation.z, glm::vec3(0, 0, 1)) *
-	glm::scale(glm::mat4(1.0f), glm::vec3(scale.x, scale.y, scale.z));
-	glm::mat4 view_transform = game->getCameraView();
-	glm::mat4 projection_transform = game->getCameraProjection();
-	glm::vec4 blend_color = {color.x, color.y, color.z, alpha};
-	
-	GLuint vertex_attr_pos = glGetAttribLocation(program, "vertex_pos");
-	GLuint uv_attr_pos = glGetAttribLocation(program, "uv_out");
-	GLuint mvp_uniform_pos = glGetUniformLocation(program, "model_view_projection");
-	GLuint texture_uniform_pos  = glGetUniformLocation(program, "tex");
-	GLuint color_uniform_pos = glGetUniformLocation(program, "color");
-	
-	glEnableVertexAttribArray(vertex_attr_pos);
-	Model m = game->getAssetManager()->getModel("default");
-	glBindBuffer(GL_ARRAY_BUFFER, m.vertex_buffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m.index_buffer);
-	glVertexAttribPointer(vertex_attr_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	glEnableVertexAttribArray(uv_attr_pos);
-	glBindBuffer(GL_ARRAY_BUFFER, game->getAssetManager()->getDefaultUV());
-	glVertexAttribPointer(uv_attr_pos, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	
-	Vec2d pos;
-	pos.y = _dimensions.y;
-	for(unsigned i = 0; i < text.size(); ++i) {
-		if(text[i] == '\n') {
-			pos.x = 0;
-			pos.y += _dimensions.y;
-			continue;
-		} else if(text[i] == ' ' || glyphs.find(text[i]) == glyphs.end()) {
-			pos.x += _dimensions.x;
-			continue;
-		}
-		glm::mat4 model_transform = glm::translate(glm::mat4(1.0f), glm::vec3(-glyphs[text[i]].bearing.x + pos.x, pos.y - glyphs[text[i]].bearing.y, 0)) *
-		glm::scale(glm::mat4(1.0f), glm::vec3(glyphs[text[i]].dimensions.x / 2, glyphs[text[i]].dimensions.y / -2, 1));
-		glm::mat4 mvp_matrix = projection_transform * view_transform * global_transform * model_transform;
-		
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, glyphs[text[i]].texture);
-		glUniform1i(texture_uniform_pos, 0);
-		glUniformMatrix4fv(mvp_uniform_pos, 1, GL_FALSE, &mvp_matrix[0][0]);
-		glUniform4fv(color_uniform_pos, 1, (GLfloat*)&blend_color);
-		
-		glDrawElements(GL_TRIANGLES, m.index_count, GL_UNSIGNED_INT, 0);
-		
-		pos.x += glyphs[text[i]].advance;
+    GLuint program = game->getAssetManager()->getProgram("default");
+    glUseProgram(program);
+    
+    glm::mat4 global_transform = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, position.z)) *
+    glm::rotate(glm::mat4(1.0f), rotation.x, glm::vec3(1, 0, 0)) * glm::rotate(glm::mat4(1.0f), rotation.y, glm::vec3(0, 1, 0)) * glm::rotate(glm::mat4(1.0f), rotation.z, glm::vec3(0, 0, 1)) *
+    glm::scale(glm::mat4(1.0f), glm::vec3(scale.x, scale.y, scale.z));
+    glm::mat4 view_transform = game->getCameraView();
+    glm::mat4 projection_transform = game->getCameraProjection();
+    glm::vec4 blend_color = {color.x, color.y, color.z, alpha};
+    
+    GLuint vertex_attr_pos = glGetAttribLocation(program, "vertex_pos");
+    GLuint uv_attr_pos = glGetAttribLocation(program, "uv_out");
+    GLuint mvp_uniform_pos = glGetUniformLocation(program, "model_view_projection");
+    GLuint texture_uniform_pos  = glGetUniformLocation(program, "tex");
+    GLuint color_uniform_pos = glGetUniformLocation(program, "color");
+    
+    glEnableVertexAttribArray(vertex_attr_pos);
+    Model m = game->getAssetManager()->getModel("default");
+    glBindBuffer(GL_ARRAY_BUFFER, m.vertex_buffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m.index_buffer);
+    glVertexAttribPointer(vertex_attr_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(uv_attr_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, game->getAssetManager()->getDefaultUV());
+    glVertexAttribPointer(uv_attr_pos, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    
+    Vec2d pos;
+    //pos.y = _dimensions.y;
+    for(unsigned i = 0; i < text.size(); ++i) {
+	if(text[i] == '\n') {
+	    pos.x = 0;
+	    pos.y += _dimensions.y;
+	    continue;
+	} else if(text[i] == ' ' || glyphs.find(text[i]) == glyphs.end()) {
+	    pos.x += _dimensions.x;
+	    continue;
 	}
+	glm::mat4 model_transform = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x - glyphs[text[i]].bearing.x, pos.y - glyphs[text[i]].bearing.y / 2, 0)) *
+	glm::scale(glm::mat4(1.0f), glm::vec3(glyphs[text[i]].dimensions.x / 2, glyphs[text[i]].dimensions.y / -2, 1));
+	glm::mat4 mvp_matrix = projection_transform * view_transform * global_transform * model_transform;
 	
-	glDisableVertexAttribArray(vertex_attr_pos);
-	glDisableVertexAttribArray(uv_attr_pos);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, glyphs[text[i]].texture);
+	glUniform1i(texture_uniform_pos, 0);
+	glUniformMatrix4fv(mvp_uniform_pos, 1, GL_FALSE, &mvp_matrix[0][0]);
+	glUniform4fv(color_uniform_pos, 1, (GLfloat*)&blend_color);
+	
+	glDrawElements(GL_TRIANGLES, m.index_count, GL_UNSIGNED_INT, 0);
+	
+	pos.x += glyphs[text[i]].advance;
+    }
+    
+    glDisableVertexAttribArray(vertex_attr_pos);
+    glDisableVertexAttribArray(uv_attr_pos);
 }
