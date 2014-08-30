@@ -4,9 +4,9 @@
 #include "System.h"
 #include "Entity.h"
 #include "AssetManager.h"
-#include "Tween.h"
+//#include "Tween.h"
 
-namespace df{
+namespace df {
 class StorageComponent;
 class Window;
 
@@ -19,7 +19,7 @@ public:
 	void cleanup();
 	void run(float delta_time);
 	void draw(float delta_time, glm::mat4 view, glm::mat4 projection);
-	void addTween(Tween<float> t);
+	//void addTween(Tween<float> t);
 	void addTweenSelf(std::string target_field, float target_value, float target_time, int itype, int etype);
 	void keyEvent(int key, int scancode, int action, int modifiers);
 	void mouseEvent(Vec2d position, int button, int action, int	modifiers);
@@ -38,7 +38,7 @@ public:
 	void insertData(lua_State* ls);
 	void retrieveData(lua_State* ls);
 	void killAll();
-	void clearTweens() { _tweens.clear(); }
+	//void clearTweens() { _tweens.clear(); }
 	Vec2d getViewSize() { return _view_size; }
 	Vec3d getCameraTranslate() {return cam_translate;}
 	Vec3d getCameraRotate() {return cam_rotate;}
@@ -61,7 +61,7 @@ protected:
 	ALCcontext* _audio_context;
 	
 	std::map<unsigned, Entity*> _entities;
-	std::vector<Tween<float>> _tweens;
+	//std::vector<Tween<float>> _tweens;
 	float _time_passed = 0;
 	int _frames = 0;
 	int _fps = 0;

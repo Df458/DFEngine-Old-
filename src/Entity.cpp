@@ -70,6 +70,7 @@ void Entity::reset() {
 	_collide_script.clear();
 	_draw_script.clear();
 }
+
 std::string Entity::getUpScr() {
 	return _update_script;
 }

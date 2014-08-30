@@ -7,6 +7,7 @@ using namespace df;
 AssetManager::AssetManager() {
 	FT_Init_FreeType(&freetype_library);
 	
+//Initialize model data for the default model, a rectangular plane
 	static const GLfloat rect_vertex_data[] = { 
 		-1.0f, -1.0f, 0.0f,
 		 1.0f, -1.0f, 0.0f,
@@ -23,13 +24,6 @@ AssetManager::AssetManager() {
 		0, 1, 2,
 		1, 2, 3
 	};
-	
-	static const GLfloat color_tex_data[] = {
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f
-	} ;
 
 	Model default_model;
 	default_model.index_count = 6;
@@ -46,6 +40,14 @@ AssetManager::AssetManager() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rect_uv_data), rect_uv_data, GL_STATIC_DRAW);
 	
 	default_model.uv_buffer = default_uv;
+
+//Initalize RGB data for the default txture, which is plain white
+	static const GLfloat color_tex_data[] = {
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f
+	} ;
 	
 	GLuint default_texture;
 	glGenTextures(1, &default_texture);
@@ -54,7 +56,8 @@ AssetManager::AssetManager() {
 	
 	textures["default"] = default_texture;
 	models["default"] = default_model;
-	
+
+//Load the default shaders	
 	loadShader("default.vert", false);
 	loadShader("default.frag");
 	std::vector<std::string>vec;
@@ -99,6 +102,17 @@ void AssetManager::cleanup() {
 	for(auto i : textures) {
 		glDeleteTextures(1, &i.second);
 	}
+	for(auto i : programs) {
+		glDeleteProgram(i.second);
+	}
+	for(auto i : shaders) {
+		glDeleteShader(i.second);
+	}
+	for(auto i : models) {
+	    glDeleteBuffers(1, &i.second.vertex_buffer);
+	    glDeleteBuffers(1, &i.second.index_buffer);
+	    glDeleteBuffers(1, &i.second.uv_buffer);
+	}
 	for(auto i : sounds) {
 		alDeleteSources(1, &i.second);
 	}
@@ -109,7 +123,8 @@ void AssetManager::cleanup() {
 	FT_Done_FreeType(freetype_library);
 }
 
-// TODO Rewrite this
+//:TODO: 30.08.14 10:09:38, Hugues Ross
+// This is old code, and needs to be rewritten
 void AssetManager::loadTexture(std::string path) {
 	std::string fname = path;
 	path = getPath().append("/data/textures/" + path);
@@ -214,7 +229,8 @@ void AssetManager::loadFont(std::string path, Vec2d size) {
 	FT_Done_Face(face);
 }
 
-// TODO Add support for new types
+//:TODO: 30.08.14 10:10:23, Hugues Ross
+// This needs support for multiple sound types, and streaming
 void AssetManager::loadSound(std::string path) {
 	std::string fname = path;
 	path = getPath().append("/data/se/" + path);
@@ -302,6 +318,8 @@ void AssetManager::loadSound(std::string path) {
 	alSourcei(sound_source, AL_BUFFER, sound_buffer);
 	
 	sounds[fname] = sound_source;
+	
+	free(input_buffer);
 }
 
 void AssetManager::loadShader(std::string path, bool frag) {
@@ -325,18 +343,7 @@ void AssetManager::loadShader(std::string path, bool frag) {
 	glShaderSource(shader, 1, shader_data, NULL);
 	glCompileShader(shader);
 	shaders[fname] = shader;
-	
-	/*GLint Result = GL_FALSE;
-	int InfoLogLength;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &Result);
-	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if ( InfoLogLength > 0 ){
-		std::cerr << "Errors in " << fname << ": \n";
-		std::cerr << "Data: \n" << shader_data[0] << "\n";
-		std::vector<char> VertexShaderErrorMessage(InfoLogLength+1);
-		glGetShaderInfoLog(shader, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
-		printf("%s\n", &VertexShaderErrorMessage[0]);
-	}*/
+	delete input_data;
 }
 
 void AssetManager::compileProgram(std::string program_id, std::vector<std::string> shader_ids) {
@@ -423,4 +430,6 @@ void AssetManager::loadModel(std::string path) {
 	//model.uv_buffer = default_uv;
 	
 	models[fname] = model;
+
+	delete final_verts;
 }
