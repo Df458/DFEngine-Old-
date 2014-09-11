@@ -8,14 +8,14 @@ namespace df {
 class Entity;
 
 enum component_type {COMPONENT_BASIC = 0, 
-					 COMPONENT_GRAPHICS,
-					 COMPONENT_PHYSICS,
-					 COMPONENT_RECTPHYSICS, 
-					 COMPONENT_CIRCLEPHYSICS, 
-					 COMPONENT_MESHPHYSICS, 
-					 COMPONENT_STORAGE, 
-					 COMPONENT_TIMER, 
-					 COMPONENT_TYPE_COUNT};
+     COMPONENT_GRAPHICS,
+     COMPONENT_PHYSICS,
+     COMPONENT_RECTPHYSICS, 
+     COMPONENT_CIRCLEPHYSICS, 
+     COMPONENT_MESHPHYSICS, 
+     COMPONENT_STORAGE, 
+     COMPONENT_TIMER, 
+     COMPONENT_TYPE_COUNT};
 const std::string component_type_str[COMPONENT_TYPE_COUNT] = { "basic", "graphics", "physics", "rectangle physics", "circle physics", "mesh physics", "storage", "timer" };
 
 enum collision_type { COLLISION_NONE, COLLISION_RECT, COLLISION_CIRCLE, COLLISION_MESH };

@@ -29,7 +29,7 @@ $(OBJPATH)%.depend: $(SRCPATH)%.cpp
 	@echo -e "Building dependecies for \e[1;35m$<\e[0m..."
 	@set -e; rm -f $@; \
 	$(CXX) -M $(CXXFLAGS) $(OSFLAGS) $< > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,obj/\1.o $@ : ,g' < $@.$$$$ > $@; \
+	sed 's,\($*\)\.o[ :]*,obj/\1.o $@ : ,g' < $@.$$$$ > $@; \z
 	rm -f $@.$$$$
 
 $(OBJPATH)%.o: $(SRCPATH)%.cpp

@@ -1,6 +1,7 @@
 #ifndef DF_SYSTEM
 #define DF_SYSTEM
 #include "Util.h"
+#include "CollisionPair.h"
 
 namespace df {
 class Component;
@@ -27,20 +28,20 @@ protected:
 
 class PhysicsSystem : public System {
 public:
-	PhysicsSystem();
-	~PhysicsSystem();
-	void run(float delta_time);
-	bool addComponent(unsigned id, Component* component);
-	void remove(unsigned id);
+    PhysicsSystem();
+    ~PhysicsSystem();
+    void run(float delta_time);
+    bool addComponent(unsigned id, Component* component);
+    void remove(unsigned id);
 protected:
-	std::map<unsigned, PhysicsComponent*> _components;
-	btBroadphaseInterface* _broad_phase;
-	btDefaultCollisionConfiguration* _collision_config;
-	btCollisionDispatcher* _collision_dispatch;
-	btSequentialImpulseConstraintSolver* _solver;
-	btDiscreteDynamicsWorld* _world;
-	btRigidBody* _test_sphere;
-	std::vector<btPersistentManifold*> collision_manifolds;
+    std::map<unsigned, PhysicsComponent*> _components;
+    btBroadphaseInterface* _broad_phase;
+    btDefaultCollisionConfiguration* _collision_config;
+    btCollisionDispatcher* _collision_dispatch;
+    btSequentialImpulseConstraintSolver* _solver;
+    btDiscreteDynamicsWorld* _world;
+    btRigidBody* _test_sphere;
+    std::vector<CollisionPair> collisions;
 };
 
 void physicsTickCallback(btDynamicsWorld *world, btScalar timeStep);

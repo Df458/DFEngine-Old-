@@ -1,6 +1,7 @@
 #include "System.h"
 #include "Game.h"
 #include "Component.h"
+#include "CollisionPair.h"
 
 using namespace df;
 
@@ -24,14 +25,14 @@ void GraphicsSystem::remove(unsigned id) {
 }
 
 PhysicsSystem::PhysicsSystem() {
-	_broad_phase = new btDbvtBroadphase();
-	_collision_config = new btDefaultCollisionConfiguration();
-	_collision_dispatch = new btCollisionDispatcher(_collision_config);
-	btGImpactCollisionAlgorithm::registerAlgorithm(_collision_dispatch);
-	_solver = new btSequentialImpulseConstraintSolver;
-	_world = new btDiscreteDynamicsWorld(_collision_dispatch, _broad_phase, _solver, _collision_config);
-	_world->setGravity(btVector3(0, 10, 0));
-	_world->setInternalTickCallback(physicsTickCallback, &collision_manifolds);
+    _broad_phase = new btDbvtBroadphase();
+    _collision_config = new btDefaultCollisionConfiguration();
+    _collision_dispatch = new btCollisionDispatcher(_collision_config);
+    btGImpactCollisionAlgorithm::registerAlgorithm(_collision_dispatch);
+    _solver = new btSequentialImpulseConstraintSolver;
+    _world = new btDiscreteDynamicsWorld(_collision_dispatch, _broad_phase, _solver, _collision_config);
+    _world->setGravity(btVector3(0, 10, 0));
+    _world->setInternalTickCallback(physicsTickCallback, &collisions);
 }
 
 PhysicsSystem::~PhysicsSystem() {
@@ -50,64 +51,64 @@ bool PhysicsSystem::addComponent(unsigned id, Component* component){
 }
 
 void PhysicsSystem::run(float delta_time) {
-	collision_manifolds.clear();
-	_world->stepSimulation(delta_time / FPS, 10);
+    //collision_manifolds.clear();
+    _world->stepSimulation(delta_time / FPS, 10);
+    
+    //for(unsigned i = 0; i < collisions.size(); ++i) {
+	//btPersistentManifold* contactManifold = collision_manifolds[i];
+/*	bool collided = false;
+	for(int i = 0; i < contactManifold->getNumContacts(); ++i)
+	    if(contactManifold->validContactDistance(contactManifold->getContactPoint(i)))
+		collided = true;
+	if(!collided)
+	    continue;*/
 	
-	for(unsigned i = 0; i < collision_manifolds.size(); ++i) {
-		btPersistentManifold* contactManifold = collision_manifolds[i];
-/*		bool collided = false;
-		for(int i = 0; i < contactManifold->getNumContacts(); ++i)
-			if(contactManifold->validContactDistance(contactManifold->getContactPoint(i)))
-				collided = true;
-		if(!collided)
-			continue;*/
-		
-		const btCollisionObject* object0 = contactManifold->getBody0();
-		const btCollisionObject* object1 = contactManifold->getBody1();
-		
-		Entity* ob1 = game->getEntity((*(int*)object0->getUserPointer()));
-		Entity* ob2 = game->getEntity((*(int*)object1->getUserPointer()));
-		lua_State* s1;
-		lua_State* s2;
-		
-		if(!ob1->getColScr().empty()) {
-			s1 = game->getState();
-			lua_newtable(s1);
-			ob1->insert(s1);
-			lua_setglobal(s1, "this");
-			lua_newtable(s1);
-			ob2->insert(s1);
-			lua_setglobal(s1, "other");
-			game->insertData(s1);
-			luaL_loadfile(s1,(getPath() + "/data/scripts/" + ob1->getColScr()).c_str());
-			if(lua_pcall(s1, 0, LUA_MULTRET, 0))
-				std::cerr << lua_tostring(s1, -1) << "\n";
-			lua_getglobal(s1, "this");
-			ob1->retrieve(s1);
-			lua_getglobal(s1, "other");
-			ob2->retrieve(s1);
-			game->retrieveData(s1);
-		}
-		
-		if(!ob2->getColScr().empty()) {
-			s2 = game->getState();
-			lua_newtable(s2);
-			ob2->insert(s2);
-			lua_setglobal(s2, "this");
-			lua_newtable(s2);
-			ob1->insert(s2);
-			lua_setglobal(s2, "other");
-			game->insertData(s2);
-			luaL_loadfile(s2,(getPath() + "/data/scripts/" + ob2->getColScr()).c_str());
-			if(lua_pcall(s2, 0, LUA_MULTRET, 0))
-				std::cerr << lua_tostring(s2, -1) << "\n";
-			lua_getglobal(s2, "this");
-			ob2->retrieve(s2);
-			lua_getglobal(s2, "other");
-			ob1->retrieve(s2);
-			game->retrieveData(s2);
-		}
-	}
+	//const btCollisionObject* object0 = contactManifold->getBody0();
+	//const btCollisionObject* object1 = contactManifold->getBody1();
+	
+	//Entity* ob1 = game->getEntity((*(int*)object0->getUserPointer()));
+	//Entity* ob2 = game->getEntity((*(int*)object1->getUserPointer()));
+	//lua_State* s1;
+	//lua_State* s2;
+	
+	//if(!ob1->getColScr().empty()) {
+	    //s1 = game->getState();
+	    //lua_newtable(s1);
+	    //ob1->insert(s1);
+	    //lua_setglobal(s1, "this");
+	    //lua_newtable(s1);
+	    //ob2->insert(s1);
+	    //lua_setglobal(s1, "other");
+	    //game->insertData(s1);
+	    //luaL_loadfile(s1,(getPath() + "/data/scripts/" + ob1->getColScr()).c_str());
+	    //if(lua_pcall(s1, 0, LUA_MULTRET, 0))
+		    //std::cerr << lua_tostring(s1, -1) << "\n";
+	    //lua_getglobal(s1, "this");
+	    //ob1->retrieve(s1);
+	    //lua_getglobal(s1, "other");
+	    //ob2->retrieve(s1);
+	    //game->retrieveData(s1);
+	//}
+	
+	//if(!ob2->getColScr().empty()) {
+	    //s2 = game->getState();
+	    //lua_newtable(s2);
+	    //ob2->insert(s2);
+	    //lua_setglobal(s2, "this");
+	    //lua_newtable(s2);
+	    //ob1->insert(s2);
+	    //lua_setglobal(s2, "other");
+	    //game->insertData(s2);
+	    //luaL_loadfile(s2,(getPath() + "/data/scripts/" + ob2->getColScr()).c_str());
+	    //if(lua_pcall(s2, 0, LUA_MULTRET, 0))
+		    //std::cerr << lua_tostring(s2, -1) << "\n";
+	    //lua_getglobal(s2, "this");
+	    //ob2->retrieve(s2);
+	    //lua_getglobal(s2, "other");
+	    //ob1->retrieve(s2);
+	    //game->retrieveData(s2);
+	//}
+    //}
 }
 
 void PhysicsSystem::remove(unsigned id) {
@@ -117,6 +118,8 @@ void PhysicsSystem::remove(unsigned id) {
     }
 }
 
+//:TODO: 11.09.14 07:41:07, Hugues Ross
+// Test and fix(?) this
 void df::physicsTickCallback(btDynamicsWorld *world, btScalar timeStep) {
 	int manifold_count = world->getDispatcher()->getNumManifolds();
 	
@@ -124,8 +127,26 @@ void df::physicsTickCallback(btDynamicsWorld *world, btScalar timeStep) {
 	
 	for(int i = 0; i < manifold_count; ++i) {
 		btPersistentManifold* contactManifold = world->getDispatcher()->getManifoldByIndexInternal(i);
-		collision_manifolds->push_back(contactManifold);
+		//collision_manifolds->push_back(contactManifold);
+		bool found = false;
+		for(int j = 0; j < collisions.size(); ++j) {
+		    if(contactManifold == collisions[j]) {
+			collisions[j].type = COLLISION_SUSTAIN;
+			npairs.push_back(collisions[j]);
+			collisions.erase(collisions.begin() + j);
+			found = true;
+			break;
+		    }
+		}
+		if(!found)
+		    npairs.push_back(make_pair(contactManifold));
 	}
+	foreach(CollisionPair p : collisions) {
+	    if(p.type != COLLISION_LEAVE)
+		p.type = COLLISION_LEAVE;
+		npairs.push_back(p);
+	}
+	collisions = npairs;
 }
 
 bool TimerSystem::addComponent(unsigned id, Component* component){
