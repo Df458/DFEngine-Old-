@@ -24,12 +24,10 @@ class Component {
 public:
 	virtual ~Component() {};
 	void run(float delta_time) { _runSub(delta_time); }
-	void* retrieve(std::string key) { return _retrieveSub(key); }
 	void insertData(lua_State* ls) { _insertDataSub(ls); }
 	void retrieveData(lua_State* ls) { return _retrieveDataSub(ls); }
 	friend class Entity;
 	virtual void _runSub(float delta_time) = 0;
-	virtual void* _retrieveSub(std::string key) = 0;
 	virtual void _insertDataSub(lua_State* ls) = 0;
 	virtual void _retrieveDataSub(lua_State* ls) = 0;
 	unsigned _owner_id = 0;
@@ -39,13 +37,6 @@ class GraphicsComponent : public Component {
 public:
 	GraphicsComponent();
 	virtual void _runSub(float delta_time);
-	virtual void* _retrieveSub(std::string key) { 
-		if(key == "color.r") return &color.x;
-		if(key == "color.g") return &color.y;
-		if(key == "color.b") return &color.z;
-		if(key == "alpha") return &alpha;
-		return nullptr;
-	}
 	virtual void _insertDataSub(lua_State* ls) {
 		lua_newtable(ls);
 		lua_pushnumber(ls, color.x);
@@ -106,9 +97,6 @@ public:
 	PhysicsComponent(btRigidBody* body_n) { body = body_n; }
 	~PhysicsComponent() { delete body; }
 	virtual void _runSub(float delta_time) {}
-	virtual void* _retrieveSub(std::string key) { 
-		return nullptr;
-	}
 	virtual void _insertDataSub(lua_State* ls) {
 		btTransform trans;
 		btVector3 linear_vel = body->getLinearVelocity();
@@ -288,7 +276,6 @@ class StorageComponent : public Component {
 public:
 	~StorageComponent() {}
 	virtual void _runSub(float delta_time) { }
-	virtual void* _retrieveSub(std::string key) { return nullptr; }
 	virtual void _insertDataSub(lua_State* ls) {
 		lua_newtable(ls);
 		for(auto i : _numbers) {
@@ -335,7 +322,6 @@ public:
 	TimerComponent() {}
 	~TimerComponent() { _timers.clear(); }
 	virtual void _runSub(float delta_time);
-	virtual void* _retrieveSub(std::string key) { return nullptr; }
 	virtual void _insertDataSub(lua_State* ls);
 	virtual void _retrieveDataSub(lua_State* ls);
 protected:

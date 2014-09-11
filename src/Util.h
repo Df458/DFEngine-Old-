@@ -46,7 +46,6 @@ extern "C" {
 #define FPS 60
 #define PI 3.14159265
 #define DEGTORAD PI / 180.0
-#define COLLISION_GRID_SCALE 64
 
 std::string getPath();
 void lua_insertpath(lua_State* ls);

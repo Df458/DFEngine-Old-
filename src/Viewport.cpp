@@ -88,16 +88,6 @@ void Viewport::run(float delta_time) {
 
 void Viewport::keyEvent(int key, int scancode, int action, int modifiers) {
 	Widget::keyEvent(key, scancode, action, modifiers);
-	if(key == GLFW_KEY_KP_ADD && action == GLFW_PRESS) {
-		game->addTween(Tween<float>(scale.getXRef(), scale.x + 0.5f, 0.5f, TWEEN_INTERP_SMOOTH_BOTH));
-		game->addTween(Tween<float>(scale.getYRef(), scale.y + 0.5f, 0.5f, TWEEN_INTERP_SMOOTH_BOTH));
-	} else if(key == GLFW_KEY_KP_SUBTRACT && action == GLFW_PRESS) {
-		game->addTween(Tween<float>(scale.getXRef(), scale.x - 0.5f, 0.5f, TWEEN_INTERP_SMOOTH_BOTH));
-		game->addTween(Tween<float>(scale.getYRef(), scale.y - 0.5f, 0.5f, TWEEN_INTERP_SMOOTH_BOTH));
-	} else if(key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
-		game->addTween(Tween<float>(scale.getXRef(), 1, 1, TWEEN_INTERP_SMOOTH_BOTH));
-		game->addTween(Tween<float>(scale.getYRef(), 1, 1, TWEEN_INTERP_SMOOTH_BOTH));
-	}
 	
 	game->keyEvent(key, scancode, action, modifiers);
 }
