@@ -122,7 +122,7 @@ void PhysicsSystem::remove(unsigned id) {
 // Test and fix(?) this
 void df::physicsTickCallback(btDynamicsWorld *world, btScalar timeStep) {
 	int manifold_count = world->getDispatcher()->getNumManifolds();
-	
+	std::vector<CollisionPair> npairs;
 	std::vector<btPersistentManifold*>* collision_manifolds = (std::vector<btPersistentManifold*>*) world->getWorldUserInfo();
 	
 	for(int i = 0; i < manifold_count; ++i) {
