@@ -55,44 +55,9 @@ void Game::cleanup() {
 	lua_close(game_state);
 }
 
-//void Game::addTween(Tween<float> t) {
-	//_tweens.push_back(t);
-//}
-
-//void Game::addTweenSelf(std::string target_field, float target_value, float target_time, int itype, int etype) {
-	//float* f;
-	//if(target_field == "cam_trans.x")
-		//f = cam_translate.getXRef();
-	//else if(target_field == "cam_trans.y")
-		//f = cam_translate.getYRef();
-	//else if(target_field == "cam_trans.z")
-		//f = cam_translate.getZRef();
-	//else if(target_field == "cam_rot.x")
-		//f = cam_rotate.getXRef();
-	//else if(target_field == "cam_rot.y")
-		//f = cam_rotate.getYRef();
-	//else if(target_field == "cam_rot.z")
-		//f = cam_rotate.getZRef();
-	//else if(target_field == "cam_scale.x")
-		//f = cam_scale.getXRef();
-	//else if(target_field == "cam_scale.y")
-		//f = cam_scale.getYRef();
-	//else if(target_field == "cam_scale.z")
-		//f = cam_scale.getZRef();
-	//else if(target_field == "back_color.r")
-		//f = bg_color.getXRef();
-	//else if(target_field == "back_color.g")
-		//f = bg_color.getYRef();
-	//else if(target_field == "back_color.b")
-		//f = bg_color.getZRef();
-	//else {
-		//std::cerr << "Error: Couldn't find " << target_field << "\n";
-		//return;
-	//}
-
-	//Tween<float> t(f, target_value, target_time, itype, etype);
-	//_tweens.push_back(t);
-//}
+int Game::getRaycast(Vec3d from, Vec3d to, short mask, short hits) {
+    return sys_physics.getFirstRaycastResult(btVector3(from.x, from.y, from.z), btVector3(to.x, to.y, to.z), mask, hits);
+}
 
 void Game::setWindow(Window* w) {
 	main_window = w;
@@ -114,14 +79,6 @@ void Game::run(float delta_time) {
 	for(auto e : _entities)
 		if(e.second->getAlive())
 			e.second->update(delta_time);
-	
-	//for(auto i = _tweens.begin(); i != _tweens.end(); ++i) {
-		//(*i).run(delta_time);
-		//if(i->finished) {
-			//_tweens.erase(i);
-			//--i;
-		//}	
-	//}
 	
 	for(int i = 0; i < 3; ++i) {
 		if(_mouse_buttons[i] == 0)

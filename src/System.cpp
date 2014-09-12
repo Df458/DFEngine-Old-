@@ -156,6 +156,23 @@ void df::physicsTickCallback(btDynamicsWorld *world, btScalar timeStep) {
     collisions = new std::vector<CollisionPair>(npairs);
 }
 
+int PhysicsSystem::getFirstRaycastResult(const btVector3& from, const btVector3& to, short mask, short collides) {
+    btCollisionWorld::ClosestRayResultCallback back(from, to);
+    _world->rayTest(from, to, back);
+    int target;
+    if(back.m_collisionObject) {
+	target = *(unsigned*)back.m_collisionObject->getUserPointer();
+    } else
+	target = -1;
+    return target;
+}
+
+//:TODO: 12.09.14 16:23:21, Hugues Ross
+// implement this
+//unsigned* PhysicsSystem::getAllRaycastResults(const btVector3& from, constbtVector3& to) {
+    //btCollisionWorld::AllHitsRayResultCallback back(from, to);
+//}
+
 bool TimerSystem::addComponent(unsigned id, Component* component){
 	_components[id] = (TimerComponent*)component;
 	return true;

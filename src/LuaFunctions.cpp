@@ -313,6 +313,44 @@ int lua_getMouseData(lua_State* ls) {
 	return 5;
 }
 
+int lua_getRaycast(lua_State* ls) {
+    short mask = 0;
+    short hits = 0;
+    if(lua_gettop(ls) >= 7)
+	mask = lua_tointeger(ls, 7);
+    if(lua_gettop(ls) >= 8)
+	hits = lua_tointeger(ls, 8);
+    lua_pushinteger(ls, game->getRaycast(Vec3d(lua_tointeger(ls, 1), lua_tointeger(ls, 2), lua_tointeger(ls, 3)), Vec3d(lua_tointeger(ls, 4), lua_tointeger(ls, 5), lua_tointeger(ls, 6)), mask, hits));
+    return 1;
+}
+
+//:FIXME: 12.09.14 18:23:20, Hugues Ross
+// This returns nothing
+int lua_getMouseOver(lua_State* ls) {
+    glm::mat4 inverse_matrix = glm::inverse(game->getCameraProjection() * game->getCameraView());
+    Vec2d pos = game->getMousePosition();
+    glm::vec4 ray_start_pos((pos.x - 0.5f) * 2, (pos.y - 0.5f) * 2, -1.0f, 1.0f);
+    ray_start_pos = inverse_matrix * ray_start_pos;
+    ray_start_pos /= ray_start_pos.w;
+    glm::vec4 ray_end_pos((pos.x - 0.5f) * 2, (pos.y - 0.5f) * 2, 0.0f, 1.0f);
+    ray_end_pos = inverse_matrix * ray_end_pos;
+    ray_end_pos /= ray_end_pos.w;
+
+    glm::vec3 final_ray(ray_end_pos - ray_start_pos);
+    final_ray = glm::normalize(final_ray);
+
+    short mask = 0;
+    short hits = 0;
+    Vec3d from(0, 0, 0); 
+    Vec3d to(final_ray.x, final_ray.y, final_ray.z);
+    if(lua_gettop(ls) >= 7)
+	mask = lua_tointeger(ls, 7);
+    if(lua_gettop(ls) >= 8)
+	hits = lua_tointeger(ls, 8);
+    lua_pushinteger(ls, game->getRaycast(from, to, mask, hits));
+    return 1;
+}
+
 int lua_getKeyboardData(lua_State* ls) {
 	unsigned char* keys = game->getKeyboardKeys();
 	lua_newtable(ls);

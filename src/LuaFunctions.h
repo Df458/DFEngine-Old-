@@ -22,6 +22,8 @@ int lua_getProgram(lua_State* ls);
 int lua_clearAll(lua_State* ls);
 int lua_addTween(lua_State* ls);
 int lua_getMouseData(lua_State* ls);
+int lua_getRaycast(lua_State* ls);
+int lua_getMouseOver(lua_State* ls);
 int lua_getKeyboardData(lua_State* ls);
 int lua_getObjectData(lua_State* ls);
 int lua_updateObjectData(lua_State* ls);
@@ -36,7 +38,8 @@ const luaL_reg lua_game_functions[] = {
 	{"addComponent", lua_addComponent},
 	{"addTween", lua_addTween},
 	{"drawText", lua_drawText},
-	{"getMouseData", lua_getMouseData},
+	{"getMouseOver", lua_getMouseOver},
+	{"getRaycast", lua_getRaycast},
 	{"setScript", lua_setScript},
 	{"getObjectData", lua_getObjectData},
 	{"updateObjectData", lua_updateObjectData},

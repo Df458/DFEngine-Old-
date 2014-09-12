@@ -33,6 +33,8 @@ public:
     void run(float delta_time);
     bool addComponent(unsigned id, Component* component);
     void remove(unsigned id);
+    int getFirstRaycastResult(const btVector3& from, const btVector3& to, short mask = 0, short hits = 0);
+    int* getAllRaycastResults(const btVector3& from, const btVector3& to, short mask = 0, short hits = 0);
 protected:
     std::map<unsigned, PhysicsComponent*> _components;
     btBroadphaseInterface* _broad_phase;

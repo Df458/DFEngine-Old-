@@ -19,8 +19,6 @@ public:
 	void cleanup();
 	void run(float delta_time);
 	void draw(float delta_time, glm::mat4 view, glm::mat4 projection);
-	//void addTween(Tween<float> t);
-	void addTweenSelf(std::string target_field, float target_value, float target_time, int itype, int etype);
 	void keyEvent(int key, int scancode, int action, int modifiers);
 	void mouseEvent(Vec2d position, int button, int action, int	modifiers);
 	void foreach(int type, std::string script);
@@ -29,6 +27,7 @@ public:
 	Vec3d getBg() { return bg_color; }
 	unsigned char* getMouseButtons() { return _mouse_buttons; }
 	unsigned char* getKeyboardKeys() { return keyboard_keys; }
+	int getRaycast(Vec3d from, Vec3d to, short mask = 0, short hits = 0);
 	void setMousePosition(Vec2d mp);
 	AssetManager* getAssetManager();
 	unsigned generateId();
@@ -61,7 +60,6 @@ protected:
 	ALCcontext* _audio_context;
 	
 	std::map<unsigned, Entity*> _entities;
-	//std::vector<Tween<float>> _tweens;
 	float _time_passed = 0;
 	int _frames = 0;
 	int _fps = 0;
