@@ -18,8 +18,6 @@ enum component_type {COMPONENT_BASIC = 0,
      COMPONENT_TYPE_COUNT};
 const std::string component_type_str[COMPONENT_TYPE_COUNT] = { "basic", "graphics", "physics", "rectangle physics", "circle physics", "mesh physics", "storage", "timer" };
 
-enum collision_type { COLLISION_NONE, COLLISION_RECT, COLLISION_CIRCLE, COLLISION_MESH };
-
 class Component {
 public:
 	virtual ~Component() {};

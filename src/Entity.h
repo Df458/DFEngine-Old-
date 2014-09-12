@@ -27,8 +27,12 @@ public:
 	void retrieve(lua_State* ls);
 	void setUpScr(std::string scr);
 	std::string getUpScr();
+	void setEnterScr(std::string scr);
+	std::string getEnterScr();
 	void setColScr(std::string scr);
 	std::string getColScr();
+	void setLeaveScr(std::string scr);
+	std::string getLeaveScr();
 	void setCreScr(std::string scr);
 	std::string getCreScr();
 	void setDrawScr(std::string scr);
@@ -37,7 +41,9 @@ protected:
 	lua_State* _state;
 	std::string _create_script;
 	std::string _update_script;
+	std::string enter_script;
 	std::string _collide_script;
+	std::string leave_script;
 	std::string _draw_script;
 	unsigned _id;
 	unsigned type = 0;

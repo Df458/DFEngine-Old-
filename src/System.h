@@ -41,7 +41,7 @@ protected:
     btSequentialImpulseConstraintSolver* _solver;
     btDiscreteDynamicsWorld* _world;
     btRigidBody* _test_sphere;
-    std::vector<CollisionPair> collisions;
+    std::vector<CollisionPair>* collisions;
 };
 
 void physicsTickCallback(btDynamicsWorld *world, btScalar timeStep);

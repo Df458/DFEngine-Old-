@@ -79,12 +79,28 @@ void Entity::setUpScr(std::string scr) {
 	_update_script = scr;
 }
 
+std::string Entity::getEnterScr() {
+	return enter_script;
+}
+
+void Entity::setEnterScr(std::string scr) {
+	enter_script = scr;
+}
+
 std::string Entity::getColScr() {
 	return _collide_script;
 }
 
 void Entity::setColScr(std::string scr) {
 	_collide_script = scr;
+}
+
+std::string Entity::getLeaveScr() {
+	return leave_script;
+}
+
+void Entity::setLeaveScr(std::string scr) {
+	leave_script = scr;
 }
 
 void Entity::setCreScr(std::string scr) {
