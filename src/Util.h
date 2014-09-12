@@ -47,6 +47,10 @@ extern "C" {
 #define PI 3.14159265
 #define DEGTORAD PI / 180.0
 
+namespace df {
+struct Model;
+}
+
 std::string getPath();
 void lua_insertpath(lua_State* ls);
 void insertVec2d(lua_State* ls, std::string key, Vec2d v);
@@ -54,5 +58,6 @@ void insertVec3d(lua_State* ls, std::string key, Vec3d v);
 void retrieveVec2d(lua_State* ls, std::string key, Vec2d& v);
 void retrieveVec3d(lua_State* ls, std::string key, Vec3d& v);
 float clamp(float val, float low, float high);
+void drawModel(df::Model* model, GLuint texture, GLuint program, glm::vec4 blend_color, glm::mat4 model_matrix, glm::mat4 view_matrix, glm::mat4 proj_matrix);
 
 #endif

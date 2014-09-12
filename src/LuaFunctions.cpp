@@ -82,6 +82,20 @@ int lua_drawText(lua_State* ls) {
 	return 0;
 }
 
+int lua_drawModel(lua_State* ls) {
+    glm::mat4 model_transform = 
+    glm::translate(glm::mat4(1.0f), glm::vec3(lua_tonumber(ls, 4), lua_tonumber(ls, 5), lua_tonumber(ls, 6))) *
+    glm::rotate(glm::mat4(1.0f), (float)lua_tonumber(ls, 10), glm::vec3(lua_tonumber(ls, 7), lua_tonumber(ls, 8), lua_tonumber(ls, 9))) *
+    glm::scale(glm::mat4(1.0f), glm::vec3(lua_tonumber(ls, 11), lua_tonumber(ls, 12), lua_tonumber(ls, 13)));
+    glm::mat4 view_transform = game->getCameraView();
+    glm::mat4 projection_transform = game->getCameraProjection();
+    glm::vec4 blend_color = {1, 1, 1, 1};
+
+    df::Model model = game->getAssetManager()->getModel(lua_tostring(ls, 1));
+    drawModel(&model, game->getAssetManager()->getTexture(lua_tostring(ls, 2)), game->getAssetManager()->getProgram(lua_tostring(ls, 3)), blend_color, model_transform, view_transform, projection_transform);
+    return 0;
+}
+
 int lua_generateID(lua_State* ls) {
 	lua_pushinteger(ls, game->generateId());
 	return 1;

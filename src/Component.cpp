@@ -13,48 +13,24 @@ GraphicsComponent::GraphicsComponent() {
 }
 
 void GraphicsComponent::_runSub(float delta_time) {
-	Component* cmp = game->getComponent(_owner_id, component_type_str[COMPONENT_PHYSICS]);
-	if(!cmp)
-		return;
+    Component* cmp = game->getComponent(_owner_id, component_type_str[COMPONENT_PHYSICS]);
+    if(!cmp)
+	    return;
 
-	PhysicsComponent* transforms = dynamic_cast<PhysicsComponent*>(cmp);
-	btMotionState* state = transforms->body->getMotionState();
-	btTransform trans;
-	float gltransform[16];
-	state->getWorldTransform(trans);
-	glm::mat4 model_transform = 
-	glm::translate(glm::mat4(1.0f), glm::vec3(trans.getOrigin().getX() * 10, trans.getOrigin().getY() * 10, trans.getOrigin().getZ())) *
-	glm::rotate(glm::mat4(1.0f), trans.getRotation().getAngle(), glm::vec3(trans.getRotation().getAxis().getX(), trans.getRotation().getAxis().getY(), trans.getRotation().getAxis().getZ())) *
-	glm::scale(glm::mat4(1.0f), glm::vec3(scale.x, scale.y, scale.z));
-	glm::mat4 view_transform = game->getCameraView();
-	glm::mat4 projection_transform = game->getCameraProjection();
-	glm::mat4 mvp_matrix = projection_transform * view_transform * model_transform;
-	glm::vec4 blend_color = {color.x, color.y, color.z, alpha};
-	
-	glUseProgram(program);
-	GLuint vertex_attr_pos = glGetAttribLocation(program, "vertex_pos");
-	GLuint uv_attr_pos = glGetAttribLocation(program, "uv_out");
-	GLuint mvp_uniform_pos = glGetUniformLocation(program, "model_view_projection");
-	GLuint texture_uniform_pos  = glGetUniformLocation(program, "tex");
-	GLuint color_uniform_pos = glGetUniformLocation(program, "color");
-	
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glUniform1i(texture_uniform_pos, 0);
-	glUniformMatrix4fv(mvp_uniform_pos, 1, GL_FALSE, &mvp_matrix[0][0]);
-	glUniform4fv(color_uniform_pos, 1, (GLfloat*)&blend_color);
-	
-	glEnableVertexAttribArray(vertex_attr_pos);
-	glBindBuffer(GL_ARRAY_BUFFER, model.vertex_buffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model.index_buffer);
-	glVertexAttribPointer(vertex_attr_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	glEnableVertexAttribArray(uv_attr_pos);
-	glBindBuffer(GL_ARRAY_BUFFER, model.uv_buffer);
-	glVertexAttribPointer(uv_attr_pos, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	glDrawElements(GL_TRIANGLES, model.index_count, GL_UNSIGNED_INT, 0);
+    PhysicsComponent* transforms = dynamic_cast<PhysicsComponent*>(cmp);
+    btMotionState* state = transforms->body->getMotionState();
+    btTransform trans;
+    float gltransform[16];
+    state->getWorldTransform(trans);
+    glm::mat4 model_transform = 
+    glm::translate(glm::mat4(1.0f), glm::vec3(trans.getOrigin().getX() * 10, trans.getOrigin().getY() * 10, trans.getOrigin().getZ())) *
+    glm::rotate(glm::mat4(1.0f), trans.getRotation().getAngle(), glm::vec3(trans.getRotation().getAxis().getX(), trans.getRotation().getAxis().getY(), trans.getRotation().getAxis().getZ())) *
+    glm::scale(glm::mat4(1.0f), glm::vec3(scale.x, scale.y, scale.z));
+    glm::mat4 view_transform = game->getCameraView();
+    glm::mat4 projection_transform = game->getCameraProjection();
+    glm::vec4 blend_color = {color.x, color.y, color.z, alpha};
 
-	glDisableVertexAttribArray(vertex_attr_pos);
-	glDisableVertexAttribArray(uv_attr_pos);
+    drawModel(&model, texture, program, blend_color, model_transform, view_transform, projection_transform);
 }
 
 void TimerComponent::_runSub(float delta_time) {

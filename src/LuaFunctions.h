@@ -11,6 +11,7 @@ int lua_loadModel(lua_State* ls);
 int lua_createProgram(lua_State* ls);
 int lua_clearTweens(lua_State* ls);
 int lua_drawText(lua_State* ls);
+int lua_drawModel(lua_State* ls);
 int lua_generateID(lua_State* ls);
 int lua_addComponent(lua_State* ls);
 int lua_setScript(lua_State* ls);
@@ -38,6 +39,7 @@ const luaL_reg lua_game_functions[] = {
 	{"addComponent", lua_addComponent},
 	{"addTween", lua_addTween},
 	{"drawText", lua_drawText},
+	{"drawModel", lua_drawModel},
 	{"getMouseOver", lua_getMouseOver},
 	{"getRaycast", lua_getRaycast},
 	{"setScript", lua_setScript},

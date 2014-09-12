@@ -1,4 +1,5 @@
 #include "Util.h"
+#include "Model.h"
 
 std::string getPath(){
 	char buf[1024];
@@ -78,4 +79,33 @@ float clamp(float val, float low, float high) {
 	else if(val > high)
 		val = high;
 	return val;
+}
+
+void drawModel(df::Model* model, GLuint texture, GLuint program, glm::vec4 blend_color, glm::mat4 model_matrix, glm::mat4 view_matrix, glm::mat4 proj_matrix) {
+	glm::mat4 mvp_matrix = proj_matrix * view_matrix * model_matrix;
+	
+	glUseProgram(program);
+	GLuint vertex_attr_pos = glGetAttribLocation(program, "vertex_pos");
+	GLuint uv_attr_pos = glGetAttribLocation(program, "uv_out");
+	GLuint mvp_uniform_pos = glGetUniformLocation(program, "model_view_projection");
+	GLuint texture_uniform_pos  = glGetUniformLocation(program, "tex");
+	GLuint color_uniform_pos = glGetUniformLocation(program, "color");
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glUniform1i(texture_uniform_pos, 0);
+	glUniformMatrix4fv(mvp_uniform_pos, 1, GL_FALSE, &mvp_matrix[0][0]);
+	glUniform4fv(color_uniform_pos, 1, (GLfloat*)&blend_color);
+	
+	glEnableVertexAttribArray(vertex_attr_pos);
+	glBindBuffer(GL_ARRAY_BUFFER, model->vertex_buffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->index_buffer);
+	glVertexAttribPointer(vertex_attr_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(uv_attr_pos);
+	glBindBuffer(GL_ARRAY_BUFFER, model->uv_buffer);
+	glVertexAttribPointer(uv_attr_pos, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glDrawElements(GL_TRIANGLES, model->index_count, GL_UNSIGNED_INT, 0);
+
+	glDisableVertexAttribArray(vertex_attr_pos);
+	glDisableVertexAttribArray(uv_attr_pos);
 }
