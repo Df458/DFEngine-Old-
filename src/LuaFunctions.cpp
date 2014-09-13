@@ -85,7 +85,7 @@ int lua_drawText(lua_State* ls) {
 int lua_drawModel(lua_State* ls) {
     glm::mat4 model_transform = 
     glm::translate(glm::mat4(1.0f), glm::vec3(lua_tonumber(ls, 4), lua_tonumber(ls, 5), lua_tonumber(ls, 6))) *
-    glm::rotate(glm::mat4(1.0f), (float)lua_tonumber(ls, 10), glm::vec3(lua_tonumber(ls, 7), lua_tonumber(ls, 8), lua_tonumber(ls, 9))) *
+    //glm::rotate(glm::mat4(1.0f), (float)lua_tonumber(ls, 7), glm::vec3(lua_tonumber(ls, 8), lua_tonumber(ls, 9), lua_tonumber(ls, 10))) *
     glm::scale(glm::mat4(1.0f), glm::vec3(lua_tonumber(ls, 11), lua_tonumber(ls, 12), lua_tonumber(ls, 13)));
     glm::mat4 view_transform = game->getCameraView();
     glm::mat4 projection_transform = game->getCameraProjection();
