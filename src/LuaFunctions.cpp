@@ -122,6 +122,9 @@ int lua_addComponent(lua_State* ls) {
 		} else if(shape_str == "Capsule") {
 		    shape = new btCapsuleShape(lua_tonumber(ls, 11), lua_tonumber(ls, 12));
 		    start = 13;
+		} else if(shape_str == "Mesh") {
+//:TODO: 13.09.14 08:54:47, Hugues Ross
+// Implement this to take in a Model and construct a tri mesh from it
 		}
 		if(!shape)
 		    break;
@@ -141,68 +144,6 @@ int lua_addComponent(lua_State* ls) {
 		cmp_dat->collision_hit  = 1;
 		game->addComponent(id, cmp_dat, component_type_str[COMPONENT_PHYSICS]);
 	    } break;
-		//case COMPONENT_RECTPHYSICS: {
-			//btCollisionShape* shape = new btBoxShape(btVector3(lua_tonumber(ls, 3)/10.0f, lua_tonumber(ls, 4)/10.0f, 1));
-			//bool has_gravity = lua_toboolean(ls, 5);
-			//btVector3 translation;
-			//btQuaternion rotation(0,0,0,1);
-			//short mask = lua_tointeger(ls, 6);
-			//short collides = lua_tointeger(ls, 7);
-			//if(arg_count >= 10)
-				//translation = btVector3(lua_tonumber(ls, 8) / 10.0f, lua_tonumber(ls, 9) / 10.0f, lua_tonumber(ls, 10) / 10.0f);
-			//if(arg_count >= 14)
-				//rotation = btQuaternion(lua_tonumber(ls, 11), lua_tonumber(ls, 12), lua_tonumber(ls, 13), lua_tonumber(ls, 14));
-			//btDefaultMotionState* motion_state = new btDefaultMotionState(btTransform(rotation, translation));
-			//btScalar mass = (lua_tonumber(ls, 3) + lua_tonumber(ls, 4)) / 2;
-			//if(!has_gravity)
-				//mass = 0;
-			//btVector3 inertia(0, 0, 0);
-		    //shape->calculateLocalInertia(mass, inertia);
-			//btRigidBody::btRigidBodyConstructionInfo c_info(mass, motion_state, shape, inertia);
-			//btRigidBody* body = new btRigidBody(c_info);
-			//body->setLinearFactor(btVector3(1, 1, 0));
-			//body->setAngularFactor(btVector3(0, 0, 0));
-			//if(arg_count >= 15)	{
-				//body->setRestitution(lua_tonumber(ls, 15));
-			//} else
-				//body->setRestitution(1);
-			//body->setFriction(0);
-			//PhysicsComponent* cmp_dat = new PhysicsComponent(body);
-			//cmp_dat->collision_mask = mask;
-			//cmp_dat->collision_hit = collides;
-			//game->addComponent(id, cmp_dat, component_type_str[COMPONENT_PHYSICS]);
-		//} break;
-		//case COMPONENT_CIRCLEPHYSICS: {
-			//btCollisionShape* shape = new btSphereShape(lua_tonumber(ls, 3) / 10.0f);
-			//bool has_gravity = lua_toboolean(ls, 4);
-			//btVector3 translation;
-			//btQuaternion rotation(0,0,0,1);
-			//short mask = lua_tointeger(ls, 5);
-			//short collides = lua_tointeger(ls, 6);
-			//if(arg_count >= 9)
-				//translation = btVector3(lua_tonumber(ls, 7) / 10.0f, lua_tonumber(ls, 8) / 10.0f, lua_tonumber(ls, 9) / 10.0f);
-			//if(arg_count >= 13)
-				//rotation = btQuaternion(lua_tonumber(ls, 10), lua_tonumber(ls, 11), lua_tonumber(ls, 12), lua_tonumber(ls, 13));
-			//btDefaultMotionState* motion_state = new btDefaultMotionState(btTransform(rotation, translation));
-			//btScalar mass = lua_tonumber(ls, 3);
-			//if(!has_gravity)
-				//mass = 0;
-			//btVector3 inertia(0, 0, 0);
-                    //shape->calculateLocalInertia(mass, inertia);
-			//btRigidBody::btRigidBodyConstructionInfo c_info(mass, motion_state, shape, inertia);
-			//btRigidBody* body = new btRigidBody(c_info);
-			//body->setLinearFactor(btVector3(1, 1, 0));
-			//body->setAngularFactor(btVector3(0, 0, 1));
-			//if(arg_count >= 14)	{
-				//body->setRestitution(lua_tonumber(ls, 14));
-			//}else
-				//body->setRestitution(1);
-			//body->setFriction(0);
-			//PhysicsComponent* cmp_dat = new PhysicsComponent(body);
-			//cmp_dat->collision_mask = mask;
-			//cmp_dat->collision_hit = collides;
-			//game->addComponent(id, cmp_dat, component_type_str[COMPONENT_PHYSICS]);
-		//} break;
 		
 		case COMPONENT_GRAPHICS: {
 			GraphicsComponent* cmp_dat = new GraphicsComponent;

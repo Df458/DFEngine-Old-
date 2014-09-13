@@ -100,6 +100,7 @@ public:
 		btVector3 linear_vel = body->getLinearVelocity();
 		btVector3 angular_vel = body->getAngularVelocity();
 		btVector3 linear_factor = body->getLinearFactor();
+		btVector3 angular_factor = body->getAngularFactor();
 		body->getMotionState()->getWorldTransform(trans);
 		
 		lua_newtable(ls);
@@ -153,6 +154,16 @@ public:
 		lua_setfield(ls, -2, "z");
 
 		lua_setfield(ls, -2, "linear_factor");
+
+		lua_newtable(ls);
+		lua_pushnumber(ls, angular_factor.getX());
+		lua_setfield(ls, -2, "x");
+		lua_pushnumber(ls, angular_factor.getY());
+		lua_setfield(ls, -2, "y");
+		lua_pushnumber(ls, angular_factor.getZ());
+		lua_setfield(ls, -2, "z");
+
+		lua_setfield(ls, -2, "angular_factor");
 		
 		lua_pushnumber(ls, body->getLinearDamping());
 		lua_setfield(ls, -2, "linear_damp");
@@ -230,6 +241,16 @@ public:
 		btVector3 lfac(lua_tonumber(ls, -3), lua_tonumber(ls, -2), lua_tonumber(ls, -1));
 		if(body->getLinearFactor() != lfac) {
 			body->setLinearFactor(lfac);
+		}
+		lua_pop(ls, 4);
+
+		lua_getfield(ls, -1, "angular_factor");
+		lua_getfield(ls, -1, "x");
+		lua_getfield(ls, -2, "y");
+		lua_getfield(ls, -3, "z");
+		btVector3 afac(lua_tonumber(ls, -3), lua_tonumber(ls, -2), lua_tonumber(ls, -1));
+		if(body->getAngularFactor() != afac) {
+			body->setAngularFactor(afac);
 		}
 		lua_pop(ls, 4);
 		

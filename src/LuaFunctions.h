@@ -40,6 +40,7 @@ const luaL_reg lua_game_functions[] = {
 	{"addTween", lua_addTween},
 	{"drawText", lua_drawText},
 	{"drawModel", lua_drawModel},
+	{"getMouseData", lua_getMouseData},
 	{"getMouseOver", lua_getMouseOver},
 	{"getRaycast", lua_getRaycast},
 	{"setScript", lua_setScript},
