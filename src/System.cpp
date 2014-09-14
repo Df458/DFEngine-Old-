@@ -40,7 +40,7 @@ PhysicsSystem::~PhysicsSystem() {
 	delete _collision_config;
 	delete _collision_dispatch;
 	delete _solver;
-	delete _world;
+	//delete _world;
 }
 
 bool PhysicsSystem::addComponent(unsigned id, Component* component){
@@ -128,32 +128,28 @@ void PhysicsSystem::remove(unsigned id) {
 
 void df::physicsTickCallback(btDynamicsWorld *world, btScalar timeStep) {
     int manifold_count = world->getDispatcher()->getNumManifolds();
-    std::vector<CollisionPair> npairs;
     std::vector<CollisionPair>* collisions = (std::vector<CollisionPair>*) world->getWorldUserInfo();
+    unsigned len = collisions->size();
+    bool* found_c = new bool[len];
     
     for(int i = 0; i < manifold_count; ++i) {
 	btPersistentManifold* contactManifold = world->getDispatcher()->getManifoldByIndexInternal(i);
-	//collision_manifolds->push_back(contactManifold);
 	bool found = false;
-	for(unsigned j = 0; j < collisions->size(); ++j) {
+	for(unsigned j = 0; j < len; ++j) {
 	    if(collisions->at(j) == contactManifold) {
-		//collisions->at(j).type = COLLISION_SUSTAIN;
-		npairs.push_back(collisions->at(j));
-		collisions->erase(collisions->begin() + j);
 		found = true;
+		found_c[j] = true;
 		break;
 	    }
 	}
 	if(!found) {
-	    npairs.push_back(make_cpair(contactManifold));
+	    collisions->push_back(make_cpair(contactManifold));
 	}
     }
-    for(CollisionPair p : *collisions) {
-	p.type = COLLISION_LEAVE;
-	npairs.push_back(p);
+    for(unsigned j = 0; j < len; ++j) {
+	collisions->at(j).type = COLLISION_LEAVE;
     }
-    delete collisions;
-    collisions = new std::vector<CollisionPair>(npairs);
+    delete found_c;
 }
 
 int PhysicsSystem::getFirstRaycastResult(const btVector3& from, const btVector3& to, short mask, short collides) {

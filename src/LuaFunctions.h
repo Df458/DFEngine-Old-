@@ -21,7 +21,6 @@ int lua_getSound(lua_State* ls);
 int lua_getShader(lua_State* ls);
 int lua_getProgram(lua_State* ls);
 int lua_clearAll(lua_State* ls);
-int lua_addTween(lua_State* ls);
 int lua_getMouseData(lua_State* ls);
 int lua_getRaycast(lua_State* ls);
 int lua_getMouseOver(lua_State* ls);
@@ -37,7 +36,6 @@ const luaL_reg lua_game_functions[] = {
 	{"getFPS", lua_getGameFPS},
 	{"generateID", lua_generateID},
 	{"addComponent", lua_addComponent},
-	{"addTween", lua_addTween},
 	{"drawText", lua_drawText},
 	{"drawModel", lua_drawModel},
 	{"getMouseData", lua_getMouseData},

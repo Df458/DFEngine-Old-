@@ -226,37 +226,6 @@ int lua_clearAll(lua_State* ls) {
 	return 0;
 }
 
-int lua_addTween(lua_State* ls) {
-	fprintf(stderr, "lua_addTween is no longer supported.\n");
-	//int arg_count = lua_gettop(ls);
-	//int id = lua_tonumber(ls, 1);
-	//std::string component_type = lua_tostring(ls, 2);
-	//std::string target_string = lua_tostring(ls, 3);
-	//float target_value = lua_tonumber(ls, 4);
-	//float target_time = lua_tonumber(ls, 5);
-	//int interp = TWEEN_INTERP_LINEAR;
-	//int ending = TWEEN_END;
-	//if(arg_count > 5)
-		//interp = lua_tonumber(ls, 6);
-	//if(arg_count > 6)
-		//ending = lua_tonumber(ls, 7);
-		
-	//if(id == -1) {
-		//game->addTweenSelf(target_string, target_value, target_time, interp, ending);
-		//return 0;
-	//}
-	
-	//Component* cmp = game->getComponent(id, component_type);
-	//if(!cmp)
-		//return 0;
-	//void* target = cmp->retrieve(target_string);
-	
-	//if(cmp != nullptr && target) {
-		//game->addTween(Tween<float>(target, target_value, target_time, interp, ending));
-	//}
-	return 0;
-}
-
 int lua_getMouseData(lua_State* ls) {
 	Vec2d pos = game->getMousePosition();
 	unsigned char* mb = game->getMouseButtons();

@@ -83,6 +83,7 @@ float clamp(float val, float low, float high) {
 
 void drawModel(df::Model* model, GLuint texture, GLuint program, glm::vec4 blend_color, glm::mat4 model_matrix, glm::mat4 view_matrix, glm::mat4 proj_matrix) {
 	glm::mat4 mvp_matrix = proj_matrix * view_matrix * model_matrix;
+	glEnable(GL_DEPTH_TEST);
 	
 	glUseProgram(program);
 	GLuint vertex_attr_pos = glGetAttribLocation(program, "vertex_pos");
