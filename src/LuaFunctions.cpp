@@ -4,6 +4,7 @@
 #include "Font.h"
 #include "Tween.h"
 #include "Component.h"
+#include "EntityMotionState.h"
 
 using namespace df;
 
@@ -135,13 +136,14 @@ int lua_addComponent(lua_State* ls) {
 		btVector3 inertia(0, 0, 0);
 		shape->calculateLocalInertia(mass, inertia);
 
-		btDefaultMotionState* motion_state = new btDefaultMotionState(btTransform(rotation, translation));
+		EntityMotionState* motion_state = new EntityMotionState(btTransform(rotation, translation));
 
 		btRigidBody::btRigidBodyConstructionInfo c_info(mass, motion_state, shape, inertia);
 		btRigidBody* body = new btRigidBody(c_info);
 		PhysicsComponent* cmp_dat = new PhysicsComponent(body);
 		cmp_dat->collision_mask = 1;
 		cmp_dat->collision_hit  = 1;
+		cmp_dat->motion_state = motion_state;
 		game->addComponent(id, cmp_dat, component_type_str[COMPONENT_PHYSICS]);
 	    } break;
 		

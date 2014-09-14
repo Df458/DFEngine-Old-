@@ -30,6 +30,7 @@ Component* Entity::getComponent(std::string cmp_id) {
 
 void Entity::setComponent(std::string cmp_id, Component* cmp) {
 	cmp->_owner_id = _id;
+	cmp->owner = this;
 	_components[cmp_id] = cmp;
 }
 
@@ -191,8 +192,35 @@ void Entity::insert(lua_State* ls) {
 	lua_setfield(ls, -2, "otype");
 	lua_pushboolean(ls, persist);
 	lua_setfield(ls, -2, "persist");
+	lua_newtable(ls);
+	lua_pushnumber(ls, position[0]);
+	lua_setfield(ls, -2, "x");
+	lua_pushnumber(ls, position[1]);
+	lua_setfield(ls, -2, "y");
+	lua_pushnumber(ls, position[2]);
+	lua_setfield(ls, -2, "z");
+	lua_setfield(ls, -2, "position");
+	lua_newtable(ls);
+	lua_pushnumber(ls, rotation[0]);
+	lua_setfield(ls, -2, "w");
+	lua_pushnumber(ls, rotation[1]);
+	lua_setfield(ls, -2, "x");
+	lua_pushnumber(ls, rotation[2]);
+	lua_setfield(ls, -2, "y");
+	lua_pushnumber(ls, rotation[3]);
+	lua_setfield(ls, -2, "z");
+	lua_setfield(ls, -2, "rotation");
+	lua_newtable(ls);
+	lua_pushnumber(ls, scale[0]);
+	lua_setfield(ls, -2, "x");
+	lua_pushnumber(ls, scale[1]);
+	lua_setfield(ls, -2, "y");
+	lua_pushnumber(ls, scale[2]);
+	lua_setfield(ls, -2, "z");
+	lua_setfield(ls, -2, "scale");
+
 	for(auto i : _components) {
-		i.second->insertData(ls);
+	    i.second->insertData(ls);
 	}
 }
 
@@ -206,9 +234,82 @@ void Entity::retrieve(lua_State* ls) {
 	lua_getfield(ls, -1, "otype");
 	type = lua_tointeger(ls, -1);
 	lua_pop(ls, 1);
+
+	lua_getfield(ls, -1, "position");
+	lua_getfield(ls, -1, "x");
+	position[0] = lua_tonumber(ls, -1);
+	lua_getfield(ls, -2, "y");
+	position[1] = lua_tonumber(ls, -1);
+	lua_getfield(ls, -3, "z");
+	position[2] = lua_tonumber(ls, -1);
+	lua_pop(ls, 4);
+
+	lua_getfield(ls, -1, "rotation");
+	lua_getfield(ls, -1, "w");
+	scale[0] = lua_tonumber(ls, -1);
+	lua_getfield(ls, -2, "x");
+	scale[1] = lua_tonumber(ls, -1);
+	lua_getfield(ls, -3, "y");
+	scale[2] = lua_tonumber(ls, -1);
+	lua_getfield(ls, -4, "z");
+	scale[3] = lua_tonumber(ls, -1);
+	lua_pop(ls, 5);
+
+	lua_getfield(ls, -1, "scale");
+	lua_getfield(ls, -1, "x");
+	scale[0] = lua_tonumber(ls, -1);
+	lua_getfield(ls, -2, "y");
+	scale[1] = lua_tonumber(ls, -1);
+	lua_getfield(ls, -3, "z");
+	scale[2] = lua_tonumber(ls, -1);
+	lua_pop(ls, 4);
+
 	if(!_to_destroy) {
 		lua_getfield(ls, -1, "alive");
 		_to_destroy = !lua_toboolean(ls, -1);
 		lua_pop(ls, 1);
 	}
+}
+
+const float* Entity::getPosition() {
+    return position;
+}
+
+void Entity::setPosition(glm::vec3 n_position) {
+    position[0] = n_position[0];
+    position[1] = n_position[1];
+    position[2] = n_position[2];
+}
+
+const float* Entity::getQuaternionRotation() {
+    return rotation;
+}
+
+void Entity::setQuaternionRotation(glm::quat n_rotation) {
+    rotation[0] = n_rotation[0];
+    rotation[1] = n_rotation[1];
+    rotation[2] = n_rotation[2];
+    rotation[3] = n_rotation[3];
+}
+
+const float* Entity::getEulerRotation() {
+    return glm::value_ptr(glm::eulerAngles(glm::quat(rotation[0], rotation[1], rotation[2], rotation[3])));
+}
+
+void Entity::setEulerRotation(glm::vec3 n_rotation) {
+    glm::quat nq_rotation(n_rotation);
+    rotation[0] = nq_rotation[0];
+    rotation[1] = nq_rotation[1];
+    rotation[2] = nq_rotation[2];
+    rotation[3] = nq_rotation[3];
+}
+
+const float* Entity::getScale() {
+    return scale;
+}
+
+void Entity::setScale(glm::vec3 n_scale) {
+    scale[0] = n_scale[0];
+    scale[1] = n_scale[1];
+    scale[2] = n_scale[2];
 }

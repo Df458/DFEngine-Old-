@@ -1,6 +1,7 @@
 #include "AssetManager.h"
 #include "LuaFunctions.h"
 #include "Entity.h"
+#include "EntityMotionState.h"
 #include "Component.h"
 //#include "Tween.h"
 #include "Game.h"
@@ -224,6 +225,7 @@ void Game::addComponent(unsigned entity_id, Component* cmp, std::string cmp_id) 
 			case COMPONENT_CIRCLEPHYSICS:
 			case COMPONENT_MESHPHYSICS:
 				sys_physics.addComponent(entity_id, cmp);
+				((PhysicsComponent*)cmp)->motion_state->registerEntity(_entities[entity_id]);
 			break;
 			case COMPONENT_TIMER:
 				sys_timer.addComponent(entity_id, cmp);

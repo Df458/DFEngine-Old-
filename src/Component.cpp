@@ -13,19 +13,10 @@ GraphicsComponent::GraphicsComponent() {
 }
 
 void GraphicsComponent::_runSub(float delta_time) {
-    Component* cmp = game->getComponent(_owner_id, component_type_str[COMPONENT_PHYSICS]);
-    if(!cmp)
-	    return;
-
-    PhysicsComponent* transforms = dynamic_cast<PhysicsComponent*>(cmp);
-    btMotionState* state = transforms->body->getMotionState();
-    btTransform trans;
-    float gltransform[16];
-    state->getWorldTransform(trans);
     glm::mat4 model_transform = 
-    glm::translate(glm::mat4(1.0f), glm::vec3(trans.getOrigin().getX() * 10, trans.getOrigin().getY() * 10, trans.getOrigin().getZ())) *
-    glm::rotate(glm::mat4(1.0f), trans.getRotation().getAngle(), glm::vec3(trans.getRotation().getAxis().getX(), trans.getRotation().getAxis().getY(), trans.getRotation().getAxis().getZ())) *
-    glm::scale(glm::mat4(1.0f), glm::vec3(scale.x, scale.y, scale.z));
+    glm::translate(glm::mat4(1.0f), glm::make_vec3(owner->getPosition()) * 10.0f) *
+    glm::mat4_cast(glm::make_quat(owner->getQuaternionRotation())) *
+    glm::scale(glm::mat4(1.0f), glm::make_vec3(owner->getScale()));
     glm::mat4 view_transform = game->getCameraView();
     glm::mat4 projection_transform = game->getCameraProjection();
     glm::vec4 blend_color = {color.x, color.y, color.z, alpha};

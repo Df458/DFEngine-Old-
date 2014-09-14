@@ -6,6 +6,7 @@
 namespace df {
 
 class Entity;
+class EntityMotionState;
 
 enum component_type {COMPONENT_BASIC = 0, 
      COMPONENT_GRAPHICS,
@@ -29,6 +30,7 @@ public:
 	virtual void _insertDataSub(lua_State* ls) = 0;
 	virtual void _retrieveDataSub(lua_State* ls) = 0;
 	unsigned _owner_id = 0;
+	Entity* owner;
 };
 
 class GraphicsComponent : public Component {
@@ -48,7 +50,7 @@ public:
 	
 		lua_setfield(ls, -2, "color");
 		
-		insertVec3d(ls, "scale", scale);
+		//insertVec3d(ls, "scale", scale);
 		
 		lua_pushinteger(ls, texture);
 		lua_setfield(ls, -2, "texture");
@@ -71,7 +73,7 @@ public:
 		alpha = lua_tonumber(ls, -1);
 		lua_pop(ls, 5);
 		
-		retrieveVec3d(ls, "scale", scale);
+		//retrieveVec3d(ls, "scale", scale);
 		
 		lua_getfield(ls, -1, "texture");
 		texture = lua_tointeger(ls, -1);
@@ -87,7 +89,7 @@ public:
 	Model model;
 	GLuint texture;
 	GLuint uv;
-	Vec3d scale = Vec3d(1, 1, 1);
+	//Vec3d scale = Vec3d(1, 1, 1);
 };
 
 class PhysicsComponent : public Component {
@@ -96,34 +98,34 @@ public:
 	~PhysicsComponent() { delete body; }
 	virtual void _runSub(float delta_time) {}
 	virtual void _insertDataSub(lua_State* ls) {
-		btTransform trans;
+		//btTransform trans;
 		btVector3 linear_vel = body->getLinearVelocity();
 		btVector3 angular_vel = body->getAngularVelocity();
 		btVector3 linear_factor = body->getLinearFactor();
 		btVector3 angular_factor = body->getAngularFactor();
-		body->getMotionState()->getWorldTransform(trans);
+		//body->getMotionState()->getWorldTransform(trans);
 		
-		lua_newtable(ls);
-		lua_pushnumber(ls, trans.getOrigin().getX());
-		lua_setfield(ls, -2, "x");
-		lua_pushnumber(ls, trans.getOrigin().getY());
-		lua_setfield(ls, -2, "y");
-		lua_pushnumber(ls, trans.getOrigin().getZ());
-		lua_setfield(ls, -2, "z");
+		//lua_newtable(ls);
+		//lua_pushnumber(ls, trans.getOrigin().getX());
+		//lua_setfield(ls, -2, "x");
+		//lua_pushnumber(ls, trans.getOrigin().getY());
+		//lua_setfield(ls, -2, "y");
+		//lua_pushnumber(ls, trans.getOrigin().getZ());
+		//lua_setfield(ls, -2, "z");
 
-		lua_setfield(ls, -2, "position");
+		//lua_setfield(ls, -2, "position");
 		
-		lua_newtable(ls);
-		lua_pushnumber(ls, trans.getRotation().getAxis().getX());
-		lua_setfield(ls, -2, "x");
-		lua_pushnumber(ls, trans.getRotation().getAxis().getY());
-		lua_setfield(ls, -2, "y");
-		lua_pushnumber(ls, trans.getRotation().getAxis().getZ());
-		lua_setfield(ls, -2, "z");
-		lua_pushnumber(ls, trans.getRotation().getW());
-		lua_setfield(ls, -2, "w");
+		//lua_newtable(ls);
+		//lua_pushnumber(ls, trans.getRotation().getAxis().getX());
+		//lua_setfield(ls, -2, "x");
+		//lua_pushnumber(ls, trans.getRotation().getAxis().getY());
+		//lua_setfield(ls, -2, "y");
+		//lua_pushnumber(ls, trans.getRotation().getAxis().getZ());
+		//lua_setfield(ls, -2, "z");
+		//lua_pushnumber(ls, trans.getRotation().getW());
+		//lua_setfield(ls, -2, "w");
 
-		lua_setfield(ls, -2, "rotation");
+		//lua_setfield(ls, -2, "rotation");
 		
 		lua_newtable(ls);
 		lua_pushnumber(ls, linear_vel.getX());
@@ -191,17 +193,17 @@ public:
 		}
 	}
 	virtual void _retrieveDataSub(lua_State* ls) {
-		btTransform trans;
-		btTransform old_trans;
-		body->getMotionState()->getWorldTransform(trans);
-		body->getMotionState()->getWorldTransform(old_trans);
+		//btTransform trans;
+		//btTransform old_trans;
+		//body->getMotionState()->getWorldTransform(trans);
+		//body->getMotionState()->getWorldTransform(old_trans);
 		
-		lua_getfield(ls, -1, "position");
-		lua_getfield(ls, -1, "x");
-		lua_getfield(ls, -2, "y");
-		lua_getfield(ls, -3, "z");
-		trans.setOrigin(btVector3(lua_tonumber(ls, -3), lua_tonumber(ls, -2),lua_tonumber(ls, -1)));
-		lua_pop(ls, 4);
+		//lua_getfield(ls, -1, "position");
+		//lua_getfield(ls, -1, "x");
+		//lua_getfield(ls, -2, "y");
+		//lua_getfield(ls, -3, "z");
+		//trans.setOrigin(btVector3(lua_tonumber(ls, -3), lua_tonumber(ls, -2),lua_tonumber(ls, -1)));
+		//lua_pop(ls, 4);
 		
 		/*lua_getfield(ls, -1, "rotation");
 		lua_getfield(ls, -1, "x");
@@ -211,10 +213,10 @@ public:
 		trans.setRotation(btQuaternion(btVector3(lua_tonumber(ls, -4), lua_tonumber(ls, -3),lua_tonumber(ls, -2)), lua_tonumber(ls, -1)));
 		lua_pop(ls, 5);*/
 		
-		if(trans.getOrigin() != old_trans.getOrigin() || trans.getRotation() != old_trans.getRotation()) {
-			body->getMotionState()->setWorldTransform(trans);
-			body->setWorldTransform(trans);
-		}
+		//if(trans.getOrigin() != old_trans.getOrigin() || trans.getRotation() != old_trans.getRotation()) {
+			//body->getMotionState()->setWorldTransform(trans);
+			//body->setWorldTransform(trans);
+		//}
 		
 		lua_getfield(ls, -1, "velocity");
 		lua_getfield(ls, -1, "x");
@@ -286,6 +288,7 @@ public:
 		}
 	}
 	
+	EntityMotionState* motion_state;
 	btRigidBody* body;
 	short collision_mask = 0;
 	short collision_hit  = 0;
