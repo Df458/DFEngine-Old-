@@ -408,10 +408,14 @@ void AssetManager::loadModel(std::string path) {
 	}
 	
 	GLfloat* final_verts = new GLfloat[uv_indices.size() * 3];
+	GLuint* final_indices = new GLuint[uv_indices.size()];
 	for(unsigned i = 0; i < uv_indices.size(); ++i) {
 		final_verts[uv_indices[i] * 3] = verts[indices[i] * 3];
 		final_verts[uv_indices[i] * 3 + 1] = verts[indices[i] * 3 + 1];
 		final_verts[uv_indices[i] * 3 + 2] = verts[indices[i] * 3 + 2];
+		final_indices[i] = uv_indices[i];
+		if(final_indices[i] > model.vertex_count)
+		    model.vertex_count = final_indices[i];
 	}
 	
 	fclose(infile);
@@ -422,14 +426,14 @@ void AssetManager::loadModel(std::string path) {
 	
 	glGenBuffers(1, &model.index_buffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model.index_buffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, uv_indices.size() * sizeof(GLuint), &uv_indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, uv_indices.size() * sizeof(GLuint), &final_indices[0], GL_STATIC_DRAW);
 	
 	glGenBuffers(1, &model.uv_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, model.uv_buffer);
 	glBufferData(GL_ARRAY_BUFFER, uv_pos.size() * sizeof(GLfloat), &uv_pos[0], GL_STATIC_DRAW);
 	//model.uv_buffer = default_uv;
 	
+	model.vertex_buffer_raw = final_verts;
 	models[fname] = model;
-
-	delete final_verts;
+	delete final_indices;
 }

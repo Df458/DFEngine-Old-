@@ -123,9 +123,21 @@ int lua_addComponent(lua_State* ls) {
 		} else if(shape_str == "Capsule") {
 		    shape = new btCapsuleShape(lua_tonumber(ls, 11), lua_tonumber(ls, 12));
 		    start = 13;
-		} else if(shape_str == "Mesh") {
-//:TODO: 13.09.14 08:54:47, Hugues Ross
-// Implement this to take in a Model and construct a tri mesh from it
+		} else if(shape_str == "Convex Mesh") {
+		    Model input_model = game->getAssetManager()->getModel(lua_tostring(ls, 11));
+		    btConvexHullShape* shape_build = new btConvexHullShape();
+		    for(unsigned i = 0; i * 3 < input_model.vertex_count; ++i) {
+			shape_build->addPoint(btVector3(input_model.vertex_buffer_raw[i * 3], input_model.vertex_buffer_raw[i * 3 + 1], input_model.vertex_buffer_raw[i * 3 + 2]));
+		    }
+		    btShapeHull* hull = new btShapeHull(shape_build);
+		    btScalar margin = shape_build->getMargin();
+		    hull->buildHull(margin);
+		    shape = new btConvexHullShape((btScalar*)hull->getVertexPointer(), hull->numVertices());
+		    delete shape_build;
+		    start = 12;
+		} else if(shape_str == "Tilemap") {
+//:TODO: 24.09.14 11:12:40, Hugues Ross
+// Implement this to take in a tilemap and generate solids from it
 		}
 		if(!shape)
 		    break;

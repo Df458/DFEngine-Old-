@@ -39,8 +39,10 @@ extern "C" {
 #include <btBulletDynamicsCommon.h>
 #ifdef WINDOWS
 	#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
+	#include <BulletCollision/CollisionShapes/btShapeHull.h>
 #else
 	#include <bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
+	#include <bullet/BulletCollision/CollisionShapes/btShapeHull.h>
 #endif
 
 #include "Vec2d.h"

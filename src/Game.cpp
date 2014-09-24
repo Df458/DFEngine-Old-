@@ -49,7 +49,7 @@ void Game::init() {
 void Game::cleanup() {
 	alcDestroyContext(_audio_context);
 	alcCloseDevice(_audio_device);
-	for(auto e : _entities) {
+	for(auto e : entities) {
 		delete e.second;
 	}
 	delete storage;
@@ -77,7 +77,7 @@ void Game::run(float delta_time) {
 	sys_physics.run(delta_time);
 	sys_timer.run(delta_time);
 	
-	for(auto e : _entities)
+	for(auto e : entities)
 		if(e.second->getAlive())
 			e.second->update(delta_time);
 	
@@ -144,7 +144,7 @@ void Game::retrieveData(lua_State* ls) {
 }
 
 void Game::killAll() {
-	for(auto e : _entities) {
+	for(auto e : entities) {
 		Entity* entity = e.second;
 		
 		if(entity->getAlive() && !entity->getPersist()) {
@@ -159,7 +159,7 @@ void Game::draw(float delta_time, glm::mat4 nview, glm::mat4 nprojection) {
 	projection = nprojection;
 
 	sys_graphics.run(delta_time);
-	for(auto e : _entities) {
+	for(auto e : entities) {
 		Entity* entity = e.second;
 		if(!entity->getDrawScr().empty() && entity->getAlive() && !entity->getDestroyed()) {
 			lua_State* s1 = game_state;
@@ -195,7 +195,7 @@ unsigned Game::generateId() {
 	if(!_free_ids.empty()) {
 		unsigned return_val = _free_ids.top();
 		_free_ids.pop();
-		_entities[return_val]->reset();
+		entities[return_val]->reset();
 		return return_val;
 	}
 
@@ -204,16 +204,16 @@ unsigned Game::generateId() {
 		return UINT_MAX;
 	}
 	
-	_entities[_next_id] = new Entity(_next_id);
-	//_entities[_next_id]._state = game_state;
+	entities[_next_id] = new Entity(_next_id);
+	//entities[_next_id]._state = game_state;
 	
 	++_next_id;
 	return _next_id - 1;
 }
 
 void Game::addComponent(unsigned entity_id, Component* cmp, std::string cmp_id) {
-	if(_entities[entity_id]->getAlive()) {
-		_entities[entity_id]->setComponent(cmp_id, cmp);
+	if(entities[entity_id]->getAlive()) {
+		entities[entity_id]->setComponent(cmp_id, cmp);
 		int cmp_type;
 		for(cmp_type = 0; cmp_type < COMPONENT_TYPE_COUNT && component_type_str[cmp_type] != cmp_id; ++cmp_type);
 		switch(cmp_type) {
@@ -225,7 +225,7 @@ void Game::addComponent(unsigned entity_id, Component* cmp, std::string cmp_id) 
 			case COMPONENT_CIRCLEPHYSICS:
 			case COMPONENT_MESHPHYSICS:
 				sys_physics.addComponent(entity_id, cmp);
-				((PhysicsComponent*)cmp)->motion_state->registerEntity(_entities[entity_id]);
+				((PhysicsComponent*)cmp)->motion_state->registerEntity(entities[entity_id]);
 			break;
 			case COMPONENT_TIMER:
 				sys_timer.addComponent(entity_id, cmp);
@@ -235,7 +235,7 @@ void Game::addComponent(unsigned entity_id, Component* cmp, std::string cmp_id) 
 }
 
 void Game::foreach(int type, std::string scr) {
-	for(auto e : _entities) {
+	for(auto e : entities) {
 		glUseProgram(0);
 		lua_State* ls = luaL_newstate();
 		luaL_openlibs(ls);
@@ -258,9 +258,9 @@ void Game::foreach(int type, std::string scr) {
 }
 
 Component* Game::getComponent(unsigned entity_id, std::string cmp_id) {
-	if(!_entities[entity_id] || !_entities[entity_id]->getAlive()) {
+	if(!entities[entity_id] || !entities[entity_id]->getAlive()) {
 		return nullptr;
 	}
 	
-	return _entities[entity_id]->getComponent(cmp_id);
+	return entities[entity_id]->getComponent(cmp_id);
 }
